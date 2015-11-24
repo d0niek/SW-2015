@@ -20,9 +20,7 @@
 #include "pca9532.h"
 #include "ea_97x60c.h"
 #include "value.h"
-
-#define LASER_A 0x00100000
-#define LASER_B 0x00400000
+#include "counter.h"
 
 #define PROC1_STACK_SIZE 1024
 #define PROC2_STACK_SIZE 1024
@@ -45,31 +43,6 @@ static void displayResult(tS32 result, tS32 position);
 volatile tU32 msClock;
 volatile tU8 killProc1 = FALSE;
 volatile tU8 rgbSpeed = 10;
-
-/******************************************************************************
- * Function name:		udelay
- *
- * Descriptions:
- *
- * parameters:			delay length
- * Returned value:		None
- *
- *****************************************************************************/
-void udelay(unsigned int delayInUs)
-{
-    // setup timer #1 for delay
-    T1TCR = 0x02;          //stop and reset timer
-    T1PR = 0x00;          //set prescaler to zero
-
-    T1MR0 = (((long) delayInUs - 1) * (long) CORE_FREQ / 1000) / 1000;
-
-    T1IR = 0xff;          //reset all interrrupt flags
-    T1MCR = 0x04;          //stop timer on match
-    T1TCR = 0x01;          //start timer
-
-    //wait until delay time has elapsed
-    while (T1TCR & 0x01);
-}
 
 /*****************************************************************************
  *
@@ -156,86 +129,8 @@ static void proc1(void *arg)
     IOSET1 = 0x000F0000;
     IODIR1 &= ~0x00F00000;  //Keys
 
-    tS32 enter = 0;
-    tS32 exit = 0;
-    tS32 almostEnter = 0;
-    tS32 almostExit = 0;
-
     for (; ;) {
-        tS32 crossA = 0;
-        tS32 crossB = 0;
-
-        static tU8 cnt;
-        tU8 rxChar;
-
-        if (enters.current > 999) {
-            printf("Exceeded the maximum value of enters\n");
-            enters.current = 0;
-            enters.setLast();
-        }
-
-        if (exits.current > 999) {
-            printf("Exceeded the maximum value of exits\n");
-            exits.current = 0;
-            exits.setLast();
-        }
-
-        // Detect if P1.20 key is pressed
-        if ((IOPIN1 & LASER_A) == 0) {
-            IOCLR1 = 0x00010000;
-            crossA = 1;
-        } else {
-            IOSET1 = 0x00010000;
-        }
-
-        // Detect if P1.22 key is pressed
-        if ((IOPIN1 & LASER_B) == 0) {
-            IOCLR1 = 0x00040000;
-            crossB = 1;
-        } else {
-            IOSET1 = 0x00040000;
-        }
-
-        if (!enter && !exit) {
-            if (crossA && !crossB) {
-                printf("Coming in\n");
-                enter = 1;
-            } else if (!crossA && crossB) {
-                printf("Coming out\n");
-                exit = 1;
-            }
-        }
-
-        if (enter && !crossA && crossB) {
-            printf("Almost enter\n");
-            almostEnter = 1;
-        }
-
-        if (exit && crossA && !crossB) {
-            printf("Almost exit\n");
-            almostExit = 1;
-        }
-
-        if (!crossA && !crossB) {
-            enter = 0;
-            exit = 0;
-
-            if (almostEnter) {
-                printf("Entered\n");
-                almostEnter = 0;
-                enters.current += 1;
-                IOCLR = 0x00040000; // zapali si� niebieska dioda RGB
-                udelay(300);
-            }
-
-            if (almostExit) {
-                printf("Went\n");
-                almostExit = 0;
-                exits.current += 1;
-                IOCLR = 0x00020000; // zapalenie diody rgb - Czerwona
-                udelay(300);
-            }
-        }
+        counter(enters, exits);
 
         // rgbLight();
 
@@ -366,15 +261,15 @@ void rgbLight()
 static void displayResult(tS32 result, tS32 position)
 {
     tU8 liczChar[3];
-    liczChar[0] = wynik / 100 + '0';
-    liczChar[1] = (wynik - ((wynik / 100) * 100)) / 10 + '0';
-    liczChar[2] = wynik % 10 + '0';
+    liczChar[0] = result / 100 + '0';
+    liczChar[1] = (result - ((result / 100) * 100)) / 10 + '0';
+    liczChar[2] = result % 10 + '0';
 
     consolSendString("Licznik \n");
     consolSendString(liczChar);
     consolSendString("\n");
 
-    lcdGotoxy(20, pozycja * 40);
+    lcdGotoxy(20, position * 40);
     lcdColor(0xA1, 0x00);
     lcdPuts(liczChar);
 }
