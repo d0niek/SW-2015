@@ -67,16 +67,15 @@
  *****************************************************************************/
 
 /* queue structure */
-typedef struct tQueue__
-{
-  tOSEvent ev;
-  void ** pQStart;
-  void ** pQEnd;
-  void ** pQIn;
-  void ** pQOut;
-  tU16 queueSize;
-  tU16 nEntries;
-}tQueue;
+typedef struct tQueue__ {
+    tOSEvent ev;
+    void **pQStart;
+    void **pQEnd;
+    void **pQIn;
+    void **pQOut;
+    tU16 queueSize;
+    tU16 nEntries;
+} tQueue;
 #ifndef _OSAPI__h
 /******************************************************************************
  * Public functions
@@ -97,9 +96,9 @@ typedef struct tQueue__
  *                      number of void pointers in the area. 
  *
  ****************************************************************************/
-void osCreateQueue(tQueue* pQueue,
-                   void**  pQueueArea,
-                   tU16    size);
+void osCreateQueue(tQueue *pQueue,
+                   void **pQueueArea,
+                   tU16 size);
 
 
 /*****************************************************************************
@@ -127,9 +126,9 @@ void osCreateQueue(tQueue* pQueue,
  *                    not allowed. 
  *
  ****************************************************************************/
-void* osPendQueue(tQueue* pQueue,
-                  tU16    timeout,
-                  tU8*    pError);
+void *osPendQueue(tQueue *pQueue,
+                  tU16 timeout,
+                  tU8 *pError);
 
 
 /*****************************************************************************
@@ -152,8 +151,8 @@ void* osPendQueue(tQueue* pQueue,
  *                    not allowed. 
  *
  ****************************************************************************/
-void* osAcceptQueue(tQueue* pQueue,
-                    tU8*    pError);
+void *osAcceptQueue(tQueue *pQueue,
+                    tU8 *pError);
 
 
 /*****************************************************************************
@@ -171,8 +170,8 @@ void* osAcceptQueue(tQueue* pQueue,
  *                    not allowed. 
  *
  ****************************************************************************/
-void osFlushQueue(tQueue* pQueue,
-                  tU8*    pError);
+void osFlushQueue(tQueue *pQueue,
+                  tU8 *pError);
 
 
 /*****************************************************************************
@@ -192,9 +191,9 @@ void osFlushQueue(tQueue* pQueue,
  *                          it was not allowed. 
  *
  ****************************************************************************/
-void osPostQueue(tQueue* pQueue,
-                 void*   msg,
-                 tU8*    pError);
+void osPostQueue(tQueue *pQueue,
+                 void *msg,
+                 tU8 *pError);
 
 
 /*****************************************************************************
@@ -214,9 +213,9 @@ void osPostQueue(tQueue* pQueue,
  *                          it was not allowed. 
  *
  ****************************************************************************/
-void osPostFrontQueue(tQueue* pQueue,
-                      void*   msg,
-                      tU8*    pError);
+void osPostFrontQueue(tQueue *pQueue,
+                      void *msg,
+                      tU8 *pError);
 
 #endif
 #endif

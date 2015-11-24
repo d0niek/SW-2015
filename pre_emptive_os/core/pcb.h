@@ -73,24 +73,33 @@
 #define PROC_SIG_WAIT   0x20
 
 /* process control block */
-typedef struct _tOSPCB__
-{
-  tU8 *pStk;                    /* pointer to top of stack */
-  struct _tOSPCB__ *pNextPrioQueueReady; /* next pointer in a prioritized ready queue */
-  struct _tOSPCB__ *pPrevPrioQueueReady; /* prev pointer in a prioritized ready queue */
-  struct _tOSPCB__ *pNextPrioQueueEvent; /* next pointer in a prioritized event queue */
-  struct _tOSPCB__ *pPrevPrioQueueEvent; /* prev pointer in a prioritized event queue */
-  struct _tOSPCB__ *pNextTimeQueue; /* next pointer in time queue */
-  tU8 pid;                      /* process id */
-  tU8 prio;                     /* process priority */
-  tU8 flag;                     /* flag (PROC_SEM_WAIT, PROC_SLEEP,...) */
-  tU32 sleep;                   /* number of ticks to sleep (relative
-                                   other processes in time list) */
-  
-  tU8 *pStkOrg;  
-  tU16 stackSize;
+typedef struct _tOSPCB__ {
+    tU8 *pStk;
+    /* pointer to top of stack */
+    struct _tOSPCB__ *pNextPrioQueueReady;
+    /* next pointer in a prioritized ready queue */
+    struct _tOSPCB__ *pPrevPrioQueueReady;
+    /* prev pointer in a prioritized ready queue */
+    struct _tOSPCB__ *pNextPrioQueueEvent;
+    /* next pointer in a prioritized event queue */
+    struct _tOSPCB__ *pPrevPrioQueueEvent;
+    /* prev pointer in a prioritized event queue */
+    struct _tOSPCB__ *pNextTimeQueue;
+    /* next pointer in time queue */
+    tU8 pid;
+    /* process id */
+    tU8 prio;
+    /* process priority */
+    tU8 flag;
+    /* flag (PROC_SEM_WAIT, PROC_SLEEP,...) */
+    tU32 sleep;
+    /* number of ticks to sleep (relative
+                    other processes in time list) */
 
-}tOSPCB;
+    tU8 *pStkOrg;
+    tU16 stackSize;
+
+} tOSPCB;
 
 #endif
 

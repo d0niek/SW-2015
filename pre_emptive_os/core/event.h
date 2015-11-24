@@ -66,10 +66,9 @@
  * Defines, macros, and typedefs
  *****************************************************************************/
 
-typedef struct _tOSEvent_ 
-{
-  tPrioQueue waitQ; /* wait queue */
-}tOSEvent;
+typedef struct _tOSEvent_ {
+    tPrioQueue waitQ; /* wait queue */
+} tOSEvent;
 #ifndef _OSAPI__h
 /******************************************************************************
  * Public functions
@@ -85,7 +84,7 @@ typedef struct _tOSEvent_
  *    [in] pEvent - A pointer to an allocated event structure. 
  *
  ****************************************************************************/
-void eventInit(tOSEvent* pEvent);
+void eventInit(tOSEvent *pEvent);
 
 
 /*****************************************************************************
@@ -101,8 +100,8 @@ void eventInit(tOSEvent* pEvent);
  *    [in] timeout - The timeout time in system ticks. 
  *
  ****************************************************************************/
-void eventWait(tOSEvent* pEvent,
-               tU32      timeout);
+void eventWait(tOSEvent *pEvent,
+               tU32 timeout);
 
 
 /*****************************************************************************
@@ -121,7 +120,7 @@ void eventWait(tOSEvent* pEvent,
  *    OS_ERROR_TIMEOUT - The function returned due to a timeout. 
  *
  ****************************************************************************/
-tU8 eventWaitReturn(tOSEvent* pEvent);
+tU8 eventWaitReturn(tOSEvent *pEvent);
 
 
 /*****************************************************************************
@@ -135,7 +134,7 @@ tU8 eventWaitReturn(tOSEvent* pEvent);
  *    [in] pEvent - A pointer to an initialized event structure. 
  *
  ****************************************************************************/
-void eventSignal(tOSEvent* pEvent);
+void eventSignal(tOSEvent *pEvent);
 
 
 /*****************************************************************************
@@ -150,7 +149,7 @@ void eventSignal(tOSEvent* pEvent);
  *    
  *
  ****************************************************************************/
-tBool eventIsEmpty(tOSEvent* pEvent);
+tBool eventIsEmpty(tOSEvent *pEvent);
 
 #endif
 #endif

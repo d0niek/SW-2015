@@ -83,10 +83,10 @@
  *    Stack pointer after initialization (new top-of-stack) 
  *
  ****************************************************************************/
-void* stkFrameInit_oshal(void  (*task) (void* arg),
-                         void* ptos,
-                         void* pParam,
-                         void  (*onReturn) (void));
+void *stkFrameInit_oshal(void  (*task)(void *arg),
+                         void *ptos,
+                         void *pParam,
+                         void  (*onReturn)(void));
 
 
 /*****************************************************************************

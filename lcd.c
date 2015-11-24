@@ -66,59 +66,58 @@ static void lcdWindow1(tU8 xp, tU8 yp, tU8 xe, tU8 ye);
  *
  ****************************************************************************/
 void
-lcdInit(void)
-{
-  bkgColor  = 0;
-  textColor = 0;
-  
-  //init SPI interface
-  initSpiForLcd();
-  
-  //select controller
-  selectLCD(TRUE);
+lcdInit(void) {
+    bkgColor = 0;
+    textColor = 0;
 
-	lcdWrcmd(LCD_CMD_SWRESET);
+    //init SPI interface
+    initSpiForLcd();
 
-	osSleep(1);
-	lcdWrcmd(LCD_CMD_SLEEPOUT);
-	lcdWrcmd(LCD_CMD_DISPON);
-	lcdWrcmd(LCD_CMD_BSTRON);
-	osSleep(1);
-		
-	lcdWrcmd(LCD_CMD_MADCTL);   //Memory data acces control
-	lcdWrdata(MADCTL_HORIZ);    //X Mirror and BGR format
-	lcdWrcmd(LCD_CMD_COLMOD);   //Colour mode
-	lcdWrdata(0x02);            //256 colour mode select
-	lcdWrcmd(LCD_CMD_INVON);    //Non Invert mode
+    //select controller
+    selectLCD(TRUE);
 
-	lcdWrcmd(LCD_CMD_RGBSET);   //LUT write
-  lcdWrdata(0);               //Red
-  lcdWrdata(2);
-  lcdWrdata(4);
-  lcdWrdata(6);
-  lcdWrdata(9);
-  lcdWrdata(11);
-  lcdWrdata(13);
-  lcdWrdata(15);
-  lcdWrdata(0);               //Green
-  lcdWrdata(2);
-  lcdWrdata(4);
-  lcdWrdata(6);
-  lcdWrdata(9);
-  lcdWrdata(11);
-  lcdWrdata(13);
-  lcdWrdata(15);
-  lcdWrdata(0);               //Blue
-  lcdWrdata(6);
-	lcdWrdata(10);
-	lcdWrdata(15);
+    lcdWrcmd(LCD_CMD_SWRESET);
 
-  //deselect controller
-  selectLCD(FALSE);
+    osSleep(1);
+    lcdWrcmd(LCD_CMD_SLEEPOUT);
+    lcdWrcmd(LCD_CMD_DISPON);
+    lcdWrcmd(LCD_CMD_BSTRON);
+    osSleep(1);
 
-	lcdContrast(56);
+    lcdWrcmd(LCD_CMD_MADCTL);   //Memory data acces control
+    lcdWrdata(MADCTL_HORIZ);    //X Mirror and BGR format
+    lcdWrcmd(LCD_CMD_COLMOD);   //Colour mode
+    lcdWrdata(0x02);            //256 colour mode select
+    lcdWrcmd(LCD_CMD_INVON);    //Non Invert mode
 
-	lcdClrscr();
+    lcdWrcmd(LCD_CMD_RGBSET);   //LUT write
+    lcdWrdata(0);               //Red
+    lcdWrdata(2);
+    lcdWrdata(4);
+    lcdWrdata(6);
+    lcdWrdata(9);
+    lcdWrdata(11);
+    lcdWrdata(13);
+    lcdWrdata(15);
+    lcdWrdata(0);               //Green
+    lcdWrdata(2);
+    lcdWrdata(4);
+    lcdWrdata(6);
+    lcdWrdata(9);
+    lcdWrdata(11);
+    lcdWrdata(13);
+    lcdWrdata(15);
+    lcdWrdata(0);               //Blue
+    lcdWrdata(6);
+    lcdWrdata(10);
+    lcdWrdata(15);
+
+    //deselect controller
+    selectLCD(FALSE);
+
+    lcdContrast(56);
+
+    lcdClrscr();
 }
 
 
@@ -129,25 +128,24 @@ lcdInit(void)
  *
  ****************************************************************************/
 void
-lcdClrscr(void)
-{
-  tU32 i;
+lcdClrscr(void) {
+    tU32 i;
 
-	lcd_x = 0;
-  lcd_y = 0;
+    lcd_x = 0;
+    lcd_y = 0;
 
-  //select controller
-  selectLCD(TRUE);   
+    //select controller
+    selectLCD(TRUE);
 
-  lcdWindow1(255,255,128,128);
-  
-  lcdWrcmd(LCD_CMD_RAMWR);    //write memory
-  
-  for(i=0; i<16900; i++)
-    lcdWrdata(bkgColor);
+    lcdWindow1(255, 255, 128, 128);
 
-  //deselect controller
-  selectLCD(FALSE);
+    lcdWrcmd(LCD_CMD_RAMWR);    //write memory
+
+    for (i = 0; i < 16900; i++)
+        lcdWrdata(bkgColor);
+
+    //deselect controller
+    selectLCD(FALSE);
 }
 
 
@@ -158,17 +156,16 @@ lcdClrscr(void)
  *
  ****************************************************************************/
 void
-lcdOff(void)
-{
-  lcdClrscr();
+lcdOff(void) {
+    lcdClrscr();
 
-  //select controller
-  selectLCD(TRUE);   
+    //select controller
+    selectLCD(TRUE);
 
-  lcdWrcmd(LCD_CMD_SLEEPIN);
+    lcdWrcmd(LCD_CMD_SLEEPIN);
 
-  //deselect controller
-  selectLCD(FALSE);
+    //deselect controller
+    selectLCD(FALSE);
 }
 
 
@@ -179,10 +176,9 @@ lcdOff(void)
  *
  ****************************************************************************/
 void
-lcdColor(tU8 bkg, tU8 text)
-{
-  bkgColor  = bkg;
-  textColor = text;
+lcdColor(tU8 bkg, tU8 text) {
+    bkgColor = bkg;
+    textColor = text;
 }
 
 
@@ -195,15 +191,15 @@ lcdColor(tU8 bkg, tU8 text)
 void
 lcdContrast(tU8 cont) //vary between 0 - 127
 {
-  //select controller
-  selectLCD(TRUE);
+    //select controller
+    selectLCD(TRUE);
 
-  //set contrast cmd.
-  lcdWrcmd(LCD_CMD_SETCON);
-	lcdWrdata(cont);
+    //set contrast cmd.
+    lcdWrcmd(LCD_CMD_SETCON);
+    lcdWrdata(cont);
 
-  //deselect controller
-  selectLCD(FALSE);
+    //deselect controller
+    selectLCD(FALSE);
 }
 
 
@@ -214,24 +210,23 @@ lcdContrast(tU8 cont) //vary between 0 - 127
  *
  ****************************************************************************/
 void
-lcdRect(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 color)
-{
-  tU32 i;
-  tU32 len;
+lcdRect(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 color) {
+    tU32 i;
+    tU32 len;
 
-  //select controller
-  selectLCD(TRUE);   
+    //select controller
+    selectLCD(TRUE);
 
-  lcdWindow1(x,y,x+xLen-1,y+yLen-1);
-  
-  lcdWrcmd(LCD_CMD_RAMWR);    //write memory
-  
-  len = xLen*yLen;
-  for(i=0; i<len; i++)
-    lcdWrdata(color);
+    lcdWindow1(x, y, x + xLen - 1, y + yLen - 1);
 
-  //deselect controller
-  selectLCD(FALSE);
+    lcdWrcmd(LCD_CMD_RAMWR);    //write memory
+
+    len = xLen * yLen;
+    for (i = 0; i < len; i++)
+        lcdWrdata(color);
+
+    //deselect controller
+    selectLCD(FALSE);
 }
 
 
@@ -243,31 +238,29 @@ lcdRect(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 color)
  *
  ****************************************************************************/
 void
-lcdRectBrd(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 color1, tU8 color2, tU8 color3)
-{
-  tU32 i,j;
+lcdRectBrd(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 color1, tU8 color2, tU8 color3) {
+    tU32 i, j;
 
-  //select controller
-  selectLCD(TRUE);   
+    //select controller
+    selectLCD(TRUE);
 
-  lcdWindow1(x,y,x+xLen-1,y+yLen-1);
-  
-  lcdWrcmd(LCD_CMD_RAMWR);    //write memory
-  
-  for(i=0; i<xLen; i++)
-    lcdWrdata(color2);
-  for(j=1; j<(yLen-2); j++)
-  {
-    lcdWrdata(color2);
-    for(i=0; i<(xLen-2); i++)
-      lcdWrdata(color1);
-    lcdWrdata(color3);
-  }
-  for(i=0; i<xLen; i++)
-    lcdWrdata(color3);
+    lcdWindow1(x, y, x + xLen - 1, y + yLen - 1);
 
-  //deselect controller
-  selectLCD(FALSE);
+    lcdWrcmd(LCD_CMD_RAMWR);    //write memory
+
+    for (i = 0; i < xLen; i++)
+        lcdWrdata(color2);
+    for (j = 1; j < (yLen - 2); j++) {
+        lcdWrdata(color2);
+        for (i = 0; i < (xLen - 2); i++)
+            lcdWrdata(color1);
+        lcdWrdata(color3);
+    }
+    for (i = 0; i < xLen; i++)
+        lcdWrdata(color3);
+
+    //deselect controller
+    selectLCD(FALSE);
 }
 
 
@@ -286,45 +279,40 @@ lcdRectBrd(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 color1, tU8 color2, tU8 color3)
  *
  ****************************************************************************/
 void
-lcdIcon(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 compressionOn, tU8 escapeChar, const tU8* pData)
-{
-  tU32 i,j;
-  tS32 len;
+lcdIcon(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 compressionOn, tU8 escapeChar, const tU8 *pData) {
+    tU32 i, j;
+    tS32 len;
 
-  //select controller
-  selectLCD(TRUE);   
+    //select controller
+    selectLCD(TRUE);
 
-  lcdWindow1(x,y,x+xLen-1,y+yLen-1);
-  
-  lcdWrcmd(LCD_CMD_RAMWR);    //write memory
-  
-  len = xLen*yLen;
-  if (compressionOn == FALSE)
-  {
-    for(i=0; i<len; i++)
-      lcdWrdata(*pData++);
-  }
-  else
-    while(len > 0)
-    {
-      if(*pData == escapeChar)
-      {
-        pData++;
-        j = *pData++;
-        for(i=0;i<j;i++)
-          lcdWrdata(*pData);
-        pData++;
-        len -= j;
-      }
-      else
-      {
-        lcdWrdata(*pData++);
-        len--;
-      }
+    lcdWindow1(x, y, x + xLen - 1, y + yLen - 1);
+
+    lcdWrcmd(LCD_CMD_RAMWR);    //write memory
+
+    len = xLen * yLen;
+    if (compressionOn == FALSE) {
+        for (i = 0; i < len; i++)
+            lcdWrdata(*pData++);
     }
+    else
+        while (len > 0) {
+            if (*pData == escapeChar) {
+                pData++;
+                j = *pData++;
+                for (i = 0; i < j; i++)
+                    lcdWrdata(*pData);
+                pData++;
+                len -= j;
+            }
+            else {
+                lcdWrdata(*pData++);
+                len--;
+            }
+        }
 
-  //deselect controller
-  selectLCD(FALSE);
+    //deselect controller
+    selectLCD(FALSE);
 }
 
 
@@ -335,11 +323,10 @@ lcdIcon(tU8 x, tU8 y, tU8 xLen, tU8 yLen, tU8 compressionOn, tU8 escapeChar, con
  *
  ****************************************************************************/
 void
-lcdGotoxy(tU8 x, tU8 y)
-{
-  lcd_x = x;
-  lcd_y = y;
-  lcdWindow(x, y, 129, 129);
+lcdGotoxy(tU8 x, tU8 y) {
+    lcd_x = x;
+    lcd_y = y;
+    lcdWindow(x, y, 129, 129);
 }
 
 
@@ -352,15 +339,14 @@ lcdGotoxy(tU8 x, tU8 y)
  *
  ****************************************************************************/
 void
-lcdWindow(tU8 xp, tU8 yp, tU8 xe, tU8 ye)
-{
-  //select controller
-  selectLCD(TRUE);
+lcdWindow(tU8 xp, tU8 yp, tU8 xe, tU8 ye) {
+    //select controller
+    selectLCD(TRUE);
 
-	lcdWindow1(xp, yp, xe, ye);
+    lcdWindow1(xp, yp, xe, ye);
 
-  //deselect controller
-  selectLCD(FALSE);
+    //deselect controller
+    selectLCD(FALSE);
 }
 
 
@@ -373,15 +359,14 @@ lcdWindow(tU8 xp, tU8 yp, tU8 xe, tU8 ye)
  *
  ****************************************************************************/
 static void
-lcdWindow1(tU8 xp, tU8 yp, tU8 xe, tU8 ye)
-{
-  lcdWrcmd(LCD_CMD_CASET);    //set X
-  lcdWrdata(xp+2);
-	lcdWrdata(xe+2);
+lcdWindow1(tU8 xp, tU8 yp, tU8 xe, tU8 ye) {
+    lcdWrcmd(LCD_CMD_CASET);    //set X
+    lcdWrdata(xp + 2);
+    lcdWrdata(xe + 2);
 
-	lcdWrcmd(LCD_CMD_PASET);    //set Y
-	lcdWrdata(yp+2);
-	lcdWrdata(ye+2);
+    lcdWrcmd(LCD_CMD_PASET);    //set Y
+    lcdWrdata(yp + 2);
+    lcdWrdata(ye + 2);
 }
 
 
@@ -392,12 +377,11 @@ lcdWindow1(tU8 xp, tU8 yp, tU8 xe, tU8 ye)
  *
  ****************************************************************************/
 static void
-lcdNewline(void)
-{
-  lcd_x  = 0;
-  lcd_y	+= 14;
-  if (lcd_y >= 126)
-    lcd_y = 126;
+lcdNewline(void) {
+    lcd_x = 0;
+    lcd_y += 14;
+    if (lcd_y >= 126)
+        lcd_y = 126;
 }
 
 
@@ -409,45 +393,41 @@ lcdNewline(void)
  *
  ****************************************************************************/
 void
-lcdData(tU8 data)
-{
-  //select controller
-  selectLCD(TRUE);
-  
-  if (data <= 127)
-  {
-    tU32 mapOffset;
-    tU8 i,j,byteToShift;
+lcdData(tU8 data) {
+    //select controller
+    selectLCD(TRUE);
 
-    data -= 30;
-    mapOffset = 14*data;
+    if (data <= 127) {
+        tU32 mapOffset;
+        tU8 i, j, byteToShift;
 
-    lcdWrcmd(LCD_CMD_CASET);
-    lcdWrdata(lcd_x+2);
-    lcdWrdata(lcd_x+9);
-    lcdWrcmd(LCD_CMD_PASET);
-    lcdWrdata(lcd_y+2);
-    lcdWrdata(lcd_y+15);
-    lcdWrcmd(LCD_CMD_RAMWR);
-    
-    for(i=0; i<14; i++)
-    {
-      byteToShift = charMap[mapOffset++];
-      for(j=0; j<8; j++)
-      {
-        if (byteToShift & 0x80)
-          lcdWrdata(textColor);
-        else
-          lcdWrdata(bkgColor);
-        byteToShift <<= 1;
-      }
+        data -= 30;
+        mapOffset = 14 * data;
+
+        lcdWrcmd(LCD_CMD_CASET);
+        lcdWrdata(lcd_x + 2);
+        lcdWrdata(lcd_x + 9);
+        lcdWrcmd(LCD_CMD_PASET);
+        lcdWrdata(lcd_y + 2);
+        lcdWrdata(lcd_y + 15);
+        lcdWrcmd(LCD_CMD_RAMWR);
+
+        for (i = 0; i < 14; i++) {
+            byteToShift = charMap[mapOffset++];
+            for (j = 0; j < 8; j++) {
+                if (byteToShift & 0x80)
+                    lcdWrdata(textColor);
+                else
+                    lcdWrdata(bkgColor);
+                byteToShift <<= 1;
+            }
+        }
     }
-  }
 
-  //deselect controller
-  selectLCD(FALSE);
+    //deselect controller
+    selectLCD(FALSE);
 
-  lcd_x += 8;
+    lcd_x += 8;
 }
 
 
@@ -459,24 +439,20 @@ lcdData(tU8 data)
  *
  ****************************************************************************/
 void
-lcdPutchar(tU8 data)
-{
-  if (data == '\n')
-    lcdNewline();
-  else if (data != '\r')
-  {
-    if (setcolmark == TRUE)
-    {
-      textColor = data;
-      setcolmark = FALSE;
+lcdPutchar(tU8 data) {
+    if (data == '\n')
+        lcdNewline();
+    else if (data != '\r') {
+        if (setcolmark == TRUE) {
+            textColor = data;
+            setcolmark = FALSE;
+        }
+        else if (data == 0xff)
+            setcolmark = TRUE;
+        else if (lcd_x <= 124) {
+            lcdData(data);
+        }
     }
-    else if (data == 0xff)
-      setcolmark = TRUE;
-    else if (lcd_x <= 124)
-    {
-      lcdData(data);
-    }
-  }
 }
 
 /*****************************************************************************
@@ -486,10 +462,9 @@ lcdPutchar(tU8 data)
  *
  ****************************************************************************/
 void
-lcdPuts(char *s)
-{
-  while(*s != '\0')
-    lcdPutchar(*s++);
+lcdPuts(char *s) {
+    while (*s != '\0')
+        lcdPutchar(*s++);
 }
 
 
@@ -500,9 +475,8 @@ lcdPuts(char *s)
  *
  ****************************************************************************/
 void
-lcdWrcmd(tU8 data)
-{
-  sendToLCD(0, data);
+lcdWrcmd(tU8 data) {
+    sendToLCD(0, data);
 }
 
 
@@ -513,9 +487,8 @@ lcdWrcmd(tU8 data)
  *
  ****************************************************************************/
 void
-lcdWrdata(tU8 data)
-{
-  sendToLCD(1, data);
+lcdWrdata(tU8 data) {
+    sendToLCD(1, data);
 }
 
 

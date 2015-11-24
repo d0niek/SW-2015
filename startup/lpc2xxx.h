@@ -87,13 +87,13 @@
 #define IOCLR3         (*((volatile unsigned long *) 0xE002803C))
 
 /* Fast I/O setup */
-#define FIO_BASE_ADDR		0x3FFFC000
-#define FIO0DIR        (*((volatile unsigned long *) 0x3FFFC000)) 
+#define FIO_BASE_ADDR        0x3FFFC000
+#define FIO0DIR        (*((volatile unsigned long *) 0x3FFFC000))
 #define FIO0MASK       (*((volatile unsigned long *) 0x3FFFC010))
 #define FIO0PIN        (*((volatile unsigned long *) 0x3FFFC014))
 #define FIO0SET        (*((volatile unsigned long *) 0x3FFFC018))
 #define FIO0CLR        (*((volatile unsigned long *) 0x3FFFC01C))
-#define FIO1DIR        (*((volatile unsigned long *) 0x3FFFC020)) 
+#define FIO1DIR        (*((volatile unsigned long *) 0x3FFFC020))
 #define FIO1MASK       (*((volatile unsigned long *) 0x3FFFC030))
 #define FIO1PIN        (*((volatile unsigned long *) 0x3FFFC034))
 #define FIO1SET        (*((volatile unsigned long *) 0x3FFFC038))
@@ -133,7 +133,7 @@
 #define RSIR           (*((volatile unsigned long *) 0xE01FC180))
 
 /* System Controls and Status */
-#define SCS            (*((volatile unsigned long *) 0xE01FC1A0))	
+#define SCS            (*((volatile unsigned long *) 0xE01FC1A0))
 
 /* Timer 0 */
 #define TIMER0_IR      (*((volatile unsigned long *) 0xE0004000))
@@ -499,7 +499,7 @@
 #define NDD_REQ_INT_SET  (*((volatile unsigned long *) 0xE00900B4))
 #define SYS_ERR_INT_STAT (*((volatile unsigned long *) 0xE00900B8))
 #define SYS_ERR_INT_CLR  (*((volatile unsigned long *) 0xE00900BC))
-#define SYS_ERR_INT_SET  (*((volatile unsigned long *) 0xE00900C0))    
+#define SYS_ERR_INT_SET  (*((volatile unsigned long *) 0xE00900C0))
 #define MODULE_ID        (*((volatile unsigned long *) 0xE00900FC))
 
 /* CAN Acceptance Filter RAM */

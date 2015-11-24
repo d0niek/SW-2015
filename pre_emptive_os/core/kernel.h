@@ -104,7 +104,7 @@ extern tOSPCB processControlBlocks[MAX_NUM_PROC];
  *                   routine. 
  *
  ****************************************************************************/
-tU8 osPid(tU8* pError);
+tU8 osPid(tU8 *pError);
 
 
 /*****************************************************************************
@@ -233,13 +233,13 @@ void osDeleteProcess(void);
  *                        system configuration (maximum number of processes). 
  *
  ****************************************************************************/
-void osCreateProcess(void  (*pProc) (void* arg),
-                     tU8*  pStk,
-                     tU16  stkSize,
-                     tU8*  pPid,
-                     tU8   prio,
-                     void* pParam,
-                     tU8*  pError);
+void osCreateProcess(void  (*pProc)(void *arg),
+                     tU8 *pStk,
+                     tU16 stkSize,
+                     tU8 *pPid,
+                     tU8 prio,
+                     void *pParam,
+                     tU8 *pError);
 
 
 /*****************************************************************************
@@ -258,8 +258,8 @@ void osCreateProcess(void  (*pProc) (void* arg),
  *    OS_ERROR_PID - The supplied pid is not correct. 
  *
  ****************************************************************************/
-void osStartProcess(tU8  pid,
-                    tU8* pError);
+void osStartProcess(tU8 pid,
+                    tU8 *pError);
 
 
 /*****************************************************************************
@@ -300,8 +300,8 @@ void osSuspend(void);
  *    OS_ERROR_PID - The supplied pid is not correct. 
  *
  ****************************************************************************/
-void osResume(tU8  pid,
-              tU8* pError);
+void osResume(tU8 pid,
+              tU8 *pError);
 
 
 /*****************************************************************************
@@ -350,7 +350,7 @@ void addToTimeList(void);
  *                remove. 
  *
  ****************************************************************************/
-void rmvFromTimeList(tOSPCB* pPCB);
+void rmvFromTimeList(tOSPCB *pPCB);
 
 
 /*****************************************************************************
@@ -362,7 +362,7 @@ void rmvFromTimeList(tOSPCB* pPCB);
  *    [in] pMove - A pointer to the process control block to add. 
  *
  ****************************************************************************/
-void addToRdyList(tOSPCB* pMove);
+void addToRdyList(tOSPCB *pMove);
 
 
 /*****************************************************************************

@@ -32,7 +32,9 @@
  * Global variables
  ****************************************************************************/
 void sendToLCD(tU8 firstBit, tU8 data);
+
 void initSpiForLcd(void);
+
 void selectLCD(tBool select);
 
 #endif

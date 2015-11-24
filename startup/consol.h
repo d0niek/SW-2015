@@ -92,7 +92,7 @@ void consolSendCh(char charToSend);
  *    [in] pString - Pointer to string to be printed 
  *
  ****************************************************************************/
-void consolSendString(char* pString);
+void consolSendString(char *pString);
 
 
 /*****************************************************************************
@@ -114,8 +114,8 @@ void consolSendString(char* pString);
 void consolSendNumber(unsigned char base,
                       unsigned char noDigits,
                       unsigned char sign,
-                      char          pad,
-                      int           number);
+                      char pad,
+                      int number);
 
 
 #if (CONSOLE_API_PRINTF == 1)  //OWN_PRINTF

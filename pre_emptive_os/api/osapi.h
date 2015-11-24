@@ -77,78 +77,83 @@
 #define OS_ERROR_PRIO         0x09
 
 /* signal structure */
-typedef struct intSig__
-{
-  struct intSig__ *pNext;
-  tU8 senderId;
-}tIntSig;
+typedef struct intSig__ {
+    struct intSig__ *pNext;
+    tU8 senderId;
+} tIntSig;
 
 /* process control block */
-typedef struct _tOSPCB__
-{
-  tU8 *pStk;                    /* pointer to top of stack */
-  struct _tOSPCB__ *pNextPrioQueueReady; /* next pointer in a prioritized ready queue */
-  struct _tOSPCB__ *pPrevPrioQueueReady; /* prev pointer in a prioritized ready queue */
-  struct _tOSPCB__ *pNextPrioQueueEvent; /* next pointer in a prioritized event queue */
-  struct _tOSPCB__ *pPrevPrioQueueEvent; /* prev pointer in a prioritized event queue */
-  struct _tOSPCB__ *pNextTimeQueue; /* next pointer in time queue */
-  tU8 pid;                      /* process id */
-  tU8 prio;                     /* process priority */
-  tU8 flag;                     /* flag (PROC_SEM_WAIT, PROC_SLEEP,...) */
-  tU32 sleep;                   /* number of ticks to sleep (relative
-                                   other processes in time list) */
-  
-  tU8 *pStkOrg;  
-  tU16 stackSize;
+typedef struct _tOSPCB__ {
+    tU8 *pStk;
+    /* pointer to top of stack */
+    struct _tOSPCB__ *pNextPrioQueueReady;
+    /* next pointer in a prioritized ready queue */
+    struct _tOSPCB__ *pPrevPrioQueueReady;
+    /* prev pointer in a prioritized ready queue */
+    struct _tOSPCB__ *pNextPrioQueueEvent;
+    /* next pointer in a prioritized event queue */
+    struct _tOSPCB__ *pPrevPrioQueueEvent;
+    /* prev pointer in a prioritized event queue */
+    struct _tOSPCB__ *pNextTimeQueue;
+    /* next pointer in time queue */
+    tU8 pid;
+    /* process id */
+    tU8 prio;
+    /* process priority */
+    tU8 flag;
+    /* flag (PROC_SEM_WAIT, PROC_SLEEP,...) */
+    tU32 sleep;
+    /* number of ticks to sleep (relative
+                    other processes in time list) */
 
-}tOSPCB;
+    tU8 *pStkOrg;
+    tU16 stackSize;
+
+} tOSPCB;
 
 #define NUM_PRIO 5
 #define MAX_NUM_PROC 5
 #define READY_QUEUE 0
 #define EVENT_QUEUE 1
 
-typedef struct _tPrioQueue_
-{
-  tOSPCB *pPrioList[NUM_PRIO];
-  tOSPCB * pPCBs;
-}tPrioQueue;
+typedef struct _tPrioQueue_ {
+    tOSPCB *pPrioList[NUM_PRIO];
+    tOSPCB *pPCBs;
+} tPrioQueue;
 
-typedef struct _tOSEvent_ 
-{
-  tPrioQueue waitQ; /* wait queue */
-}tOSEvent;
+typedef struct _tOSEvent_ {
+    tPrioQueue waitQ; /* wait queue */
+} tOSEvent;
 
-typedef struct _tCntSem_
-{
-  tOSEvent ev;
-  tU16 cnt;
+typedef struct _tCntSem_ {
+    tOSEvent ev;
+    tU16 cnt;
 
-}tCntSem;
+} tCntSem;
 
 /* queue structure */
-typedef struct tQueue__
-{
-  tOSEvent ev;
-  void ** pQStart;
-  void ** pQEnd;
-  void ** pQIn;
-  void ** pQOut;
-  tU16 queueSize;
-  tU16 nEntries;
-}tQueue;
+typedef struct tQueue__ {
+    tOSEvent ev;
+    void **pQStart;
+    void **pQEnd;
+    void **pQIn;
+    void **pQOut;
+    tU16 queueSize;
+    tU16 nEntries;
+} tQueue;
 
 /* timer structure */
-typedef struct _tTimer__
-{
-  struct _tTimer__ * next;
-  struct _tTimer__ * previous;
-  struct _tTimer__ * list;
-  void (*callback)(void);
-  tU32 delta;
-  tU32 time;
-  tBool repeat;
-}tTimer;
+typedef struct _tTimer__ {
+    struct _tTimer__ *next;
+    struct _tTimer__ *previous;
+    struct _tTimer__ *list;
+
+    void (*callback)(void);
+
+    tU32 delta;
+    tU32 time;
+    tBool repeat;
+} tTimer;
 
 /*****************************************************************************
  *
@@ -204,7 +209,7 @@ typedef struct _tTimer__
  *                   routine. 
  *
  ****************************************************************************/
-tU8 osPid(tU8* pError);
+tU8 osPid(tU8 *pError);
 
 
 /*****************************************************************************
@@ -304,13 +309,13 @@ void osDeleteProcess(void);
  *                        system configuration (maximum number of processes). 
  *
  ****************************************************************************/
-void osCreateProcess(void  (*pProc) (void* arg),
-                     tU8*  pStk,
-                     tU16  stkSize,
-                     tU8*  pPid,
-                     tU8   prio,
-                     void* pParam,
-                     tU8*  pError);
+void osCreateProcess(void  (*pProc)(void *arg),
+                     tU8 *pStk,
+                     tU16 stkSize,
+                     tU8 *pPid,
+                     tU8 prio,
+                     void *pParam,
+                     tU8 *pError);
 
 
 /*****************************************************************************
@@ -329,8 +334,8 @@ void osCreateProcess(void  (*pProc) (void* arg),
  *    OS_ERROR_PID - The supplied pid is not correct. 
  *
  ****************************************************************************/
-void osStartProcess(tU8  pid,
-                    tU8* pError);
+void osStartProcess(tU8 pid,
+                    tU8 *pError);
 
 
 /*****************************************************************************
@@ -358,8 +363,8 @@ void osSuspend(void);
  *    OS_ERROR_PID - The supplied pid is not correct. 
  *
  ****************************************************************************/
-void osResume(tU8  pid,
-              tU8* pError);
+void osResume(tU8 pid,
+              tU8 *pError);
 
 
 /*****************************************************************************
@@ -402,8 +407,8 @@ void osISRExit(void);
  *    [in] initial - The initial counter value. 
  *
  ****************************************************************************/
-void osSemInit(tCntSem* pSem,
-               tU16     initial);
+void osSemInit(tCntSem *pSem,
+               tU16 initial);
 
 
 /*****************************************************************************
@@ -430,9 +435,9 @@ void osSemInit(tCntSem* pSem,
  *                    not allowed. 
  *
  ****************************************************************************/
-tBool osSemTake(tCntSem* pSem,
-                tU32     timeout,
-                tU8*     pError);
+tBool osSemTake(tCntSem *pSem,
+                tU32 timeout,
+                tU8 *pError);
 
 
 /*****************************************************************************
@@ -452,8 +457,8 @@ tBool osSemTake(tCntSem* pSem,
  *                    not allowed. 
  *
  ****************************************************************************/
-void osSemGive(tCntSem* pSem,
-               tU8*     pError);
+void osSemGive(tCntSem *pSem,
+               tU8 *pError);
 
 
 /*****************************************************************************
@@ -476,8 +481,8 @@ void osSemGive(tCntSem* pSem,
  *                    not allowed. 
  *
  ****************************************************************************/
-tU8 osSemTryTake(tCntSem* pSem,
-                 tU8*     pError);
+tU8 osSemTryTake(tCntSem *pSem,
+                 tU8 *pError);
 
 
 /*****************************************************************************
@@ -494,9 +499,9 @@ tU8 osSemTryTake(tCntSem* pSem,
  *                      number of void pointers in the area. 
  *
  ****************************************************************************/
-void osCreateQueue(tQueue* pQueue,
-                   void**  pQueueArea,
-                   tU16    size);
+void osCreateQueue(tQueue *pQueue,
+                   void **pQueueArea,
+                   tU16 size);
 
 
 /*****************************************************************************
@@ -524,9 +529,9 @@ void osCreateQueue(tQueue* pQueue,
  *                    not allowed. 
  *
  ****************************************************************************/
-void* osPendQueue(tQueue* pQueue,
-                  tU16    timeout,
-                  tU8*    pError);
+void *osPendQueue(tQueue *pQueue,
+                  tU16 timeout,
+                  tU8 *pError);
 
 
 /*****************************************************************************
@@ -549,8 +554,8 @@ void* osPendQueue(tQueue* pQueue,
  *                    not allowed. 
  *
  ****************************************************************************/
-void* osAcceptQueue(tQueue* pQueue,
-                    tU8*    pError);
+void *osAcceptQueue(tQueue *pQueue,
+                    tU8 *pError);
 
 
 /*****************************************************************************
@@ -568,8 +573,8 @@ void* osAcceptQueue(tQueue* pQueue,
  *                    not allowed. 
  *
  ****************************************************************************/
-void osFlushQueue(tQueue* pQueue,
-                  tU8*    pError);
+void osFlushQueue(tQueue *pQueue,
+                  tU8 *pError);
 
 
 /*****************************************************************************
@@ -589,9 +594,9 @@ void osFlushQueue(tQueue* pQueue,
  *                          it was not allowed. 
  *
  ****************************************************************************/
-void osPostQueue(tQueue* pQueue,
-                 void*   msg,
-                 tU8*    pError);
+void osPostQueue(tQueue *pQueue,
+                 void *msg,
+                 tU8 *pError);
 
 
 /*****************************************************************************
@@ -611,9 +616,9 @@ void osPostQueue(tQueue* pQueue,
  *                          it was not allowed. 
  *
  ****************************************************************************/
-void osPostFrontQueue(tQueue* pQueue,
-                      void*   msg,
-                      tU8*    pError);
+void osPostFrontQueue(tQueue *pQueue,
+                      void *msg,
+                      tU8 *pError);
 
 
 /*****************************************************************************
@@ -636,10 +641,10 @@ void osPostFrontQueue(tQueue* pQueue,
  *    [in] time     - The initial timer value, specified in system ticks. 
  *
  ****************************************************************************/
-void osCreateTimer(tTimer* pTimer,
-                   void    (*callback) (void),
-                   tBool   repeat,
-                   tU32    time);
+void osCreateTimer(tTimer *pTimer,
+                   void    (*callback)(void),
+                   tBool repeat,
+                   tU32 time);
 
 
 /*****************************************************************************
@@ -660,8 +665,8 @@ void osCreateTimer(tTimer* pTimer,
  *                    not allowed. 
  *
  ****************************************************************************/
-void osDeleteTimer(tTimer* pTimer,
-                   tU8*    pError);
+void osDeleteTimer(tTimer *pTimer,
+                   tU8 *pError);
 
 
 /*****************************************************************************
@@ -683,7 +688,7 @@ void osDeleteTimer(tTimer* pTimer,
  *                        processes). 
  *
  ****************************************************************************/
-void osInitTimers(tU8* pError);
+void osInitTimers(tU8 *pError);
 
 
 /*****************************************************************************

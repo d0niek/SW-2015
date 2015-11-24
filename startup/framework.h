@@ -94,6 +94,7 @@ extern unsigned char *pHeapEnd;
  * Public functions
  *****************************************************************************/
 void lowLevelInit(void);
+
 void eaInit(void);
 
 #endif

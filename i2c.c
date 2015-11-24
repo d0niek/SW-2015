@@ -1,7 +1,3 @@
-
-
-
-
 /******************************************************************************
  * Includes
  *****************************************************************************/
@@ -72,22 +68,20 @@
  *
  *****************************************************************************/
 tU8
-i2cCheckStatus(void)
-{
-  tU8 status = 0;
+i2cCheckStatus(void) {
+    tU8 status = 0;
 
-  /* wait for I2C Status changed */
-  while( (I2C_CONSET & 0x08)  == 0)   /* while SI == 0 */
-  {
-    ;
-  }
+    /* wait for I2C Status changed */
+    while ((I2C_CONSET & 0x08) == 0)   /* while SI == 0 */
+    { ;
+    }
 
-  /* Read I2C State */
-  status = I2C_STAT;
+    /* Read I2C State */
+    status = I2C_STAT;
 
-  /* NOTE! SI flag is not cleared here */
+    /* NOTE! SI flag is not cleared here */
 
-  return status;
+    return status;
 }
 
 /******************************************************************************
@@ -97,18 +91,17 @@ i2cCheckStatus(void)
  *
  *****************************************************************************/
 void
-i2cInit(void)
-{
-  PINSEL0  |= 0x50;
+i2cInit(void) {
+    PINSEL0 |= 0x50;
 
-  /* clear flags */
-  I2C_CONCLR = 0x6c;    
+    /* clear flags */
+    I2C_CONCLR = 0x6c;
 
-  /* reset registers */
-  I2C_SCLL   = ( I2C_SCLL   & ~I2C_REG_SCLL_MASK )   | I2C_REG_SCLL;
-  I2C_SCLH   = ( I2C_SCLH   & ~I2C_REG_SCLH_MASK )   | I2C_REG_SCLH;
-  I2C_ADDR   = ( I2C_ADDR   & ~I2C_REG_ADDR_MASK )   | I2C_REG_ADDR;
-  I2C_CONSET = ( I2C_CONSET & ~I2C_REG_CONSET_MASK ) | I2C_REG_CONSET;
+    /* reset registers */
+    I2C_SCLL = (I2C_SCLL & ~I2C_REG_SCLL_MASK) | I2C_REG_SCLL;
+    I2C_SCLH = (I2C_SCLH & ~I2C_REG_SCLH_MASK) | I2C_REG_SCLH;
+    I2C_ADDR = (I2C_ADDR & ~I2C_REG_ADDR_MASK) | I2C_REG_ADDR;
+    I2C_CONSET = (I2C_CONSET & ~I2C_REG_CONSET_MASK) | I2C_REG_CONSET;
 }
 
 /******************************************************************************
@@ -125,44 +118,39 @@ i2cInit(void)
  *
  *****************************************************************************/
 tS8
-i2cStart(void)
-{
-  tU8   status  = 0;
-  tS8   retCode = 0;
+i2cStart(void) {
+    tU8 status = 0;
+    tS8 retCode = 0;
 
-  /* issue a start condition */
-  I2C_CONSET |= 0x20; /* STA = 1, set start flag */
+    /* issue a start condition */
+    I2C_CONSET |= 0x20; /* STA = 1, set start flag */
 
-  /* wait until START transmitted */
-  while(1)
-  {
-    status = i2cCheckStatus();
+    /* wait until START transmitted */
+    while (1) {
+        status = i2cCheckStatus();
 
-    /* start transmitted */
-    if((status == 0x08) || (status == 0x10))
-    {
-      retCode = I2C_CODE_OK;
-      break;
+        /* start transmitted */
+        if ((status == 0x08) || (status == 0x10)) {
+            retCode = I2C_CODE_OK;
+            break;
+        }
+
+            /* error */
+        else if (status != 0xf8) {
+            retCode = (tS8) status;
+            break;
+        }
+
+        else {
+            /* clear SI flag */
+            I2C_CONCLR = 0x08;
+        }
     }
 
-    /* error */
-    else if(status != 0xf8)
-    {
-      retCode = (tS8) status;
-      break;
-    }
+    /* clear start flag */
+    I2C_CONCLR = 0x20;
 
-    else
-    {
-      /* clear SI flag */
-      I2C_CONCLR = 0x08;
-    }    
-  }
-
-  /* clear start flag */
-  I2C_CONCLR = 0x20;
-
-  return retCode;
+    return retCode;
 }
 
 /******************************************************************************
@@ -179,45 +167,40 @@ i2cStart(void)
  *
  *****************************************************************************/
 tS8
-i2cRepeatStart(void)
-{
-  tU8   status  = 0;
-  tS8   retCode = 0;
+i2cRepeatStart(void) {
+    tU8 status = 0;
+    tS8 retCode = 0;
 
-  /* issue a start condition */
-  I2C_CONSET |= 0x20; /* STA = 1, set start flag */
-  I2C_CONCLR = 0x08;  /* clear SI flag           */
+    /* issue a start condition */
+    I2C_CONSET |= 0x20; /* STA = 1, set start flag */
+    I2C_CONCLR = 0x08;  /* clear SI flag           */
 
-  /* wait until START transmitted */
-  while(1)
-  {
-    status = i2cCheckStatus();
+    /* wait until START transmitted */
+    while (1) {
+        status = i2cCheckStatus();
 
-    /* start transmitted */
-    if((status == 0x08) || (status == 0x10))
-    {
-      retCode = I2C_CODE_OK;
-      break;
+        /* start transmitted */
+        if ((status == 0x08) || (status == 0x10)) {
+            retCode = I2C_CODE_OK;
+            break;
+        }
+
+            /* error */
+        else if (status != 0xf8) {
+            retCode = (tS8) status;
+            break;
+        }
+
+        else {
+            /* clear SI flag */
+            I2C_CONCLR = 0x08;
+        }
     }
 
-    /* error */
-    else if(status != 0xf8)
-    {
-      retCode = (tS8) status;
-      break;
-    }
+    /* clear start flag */
+    I2C_CONCLR = 0x20;
 
-    else
-    {
-      /* clear SI flag */
-      I2C_CONCLR = 0x08;
-    }    
-  }
-
-  /* clear start flag */
-  I2C_CONCLR = 0x20;
-
-  return retCode;
+    return retCode;
 }
 
 /******************************************************************************
@@ -234,19 +217,17 @@ i2cRepeatStart(void)
  *
  *****************************************************************************/
 tS8
-i2cStop(void)
-{
-  I2C_CONSET |= 0x10; /* STO = 1, set stop flag */ 
-  I2C_CONCLR = 0x08;  /* clear SI flag          */ 
+i2cStop(void) {
+    I2C_CONSET |= 0x10; /* STO = 1, set stop flag */
+    I2C_CONCLR = 0x08;  /* clear SI flag          */
 
-  /* wait for STOP detected (while STO = 1) */
-  while((I2C_CONSET & 0x10) == 0x10 )
-  {
-    /* do nothing */
-    ;
-  }
+    /* wait for STOP detected (while STO = 1) */
+    while ((I2C_CONSET & 0x10) == 0x10) {
+        /* do nothing */
+        ;
+    }
 
-  return I2C_CODE_OK;
+    return I2C_CODE_OK;
 }
 
 /******************************************************************************
@@ -263,25 +244,23 @@ i2cStop(void)
  *
  *****************************************************************************/
 tS8
-i2cPutChar(tU8 data)
-{
-  tS8 retCode = 0;
+i2cPutChar(tU8 data) {
+    tS8 retCode = 0;
 
-  /* check if I2C Data register can be accessed */
-  if((I2C_CONSET & 0x08) != 0)  /* if SI = 1 */
-  {
-    /* send data */
-    I2C_DATA   = data;
-    I2C_CONCLR = 0x08; /* clear SI flag */ 
-    retCode    = I2C_CODE_OK;
-  }
-  else
-  {
-    /* data register not ready */
-    retCode = I2C_CODE_BUSY;
-  }
+    /* check if I2C Data register can be accessed */
+    if ((I2C_CONSET & 0x08) != 0)  /* if SI = 1 */
+    {
+        /* send data */
+        I2C_DATA = data;
+        I2C_CONCLR = 0x08; /* clear SI flag */
+        retCode = I2C_CODE_OK;
+    }
+    else {
+        /* data register not ready */
+        retCode = I2C_CODE_BUSY;
+    }
 
-  return retCode;
+    return retCode;
 }
 
 /******************************************************************************
@@ -303,42 +282,37 @@ i2cPutChar(tU8 data)
  *
  *****************************************************************************/
 tS8
-i2cGetChar(tU8  mode,
-           tU8* pData)
-{
-  tS8 retCode = I2C_CODE_OK;
+i2cGetChar(tU8 mode,
+           tU8 *pData) {
+    tS8 retCode = I2C_CODE_OK;
 
-  if(mode == I2C_MODE_ACK0)
-  {
-    /* the operation mode is changed from master transmit to master receive */
+    if (mode == I2C_MODE_ACK0) {
+        /* the operation mode is changed from master transmit to master receive */
 
-    /* set ACK=0 (informs slave to send next byte) */
+        /* set ACK=0 (informs slave to send next byte) */
 
-    I2C_CONSET |= 0x04; /* AA=1          */
-    I2C_CONCLR = 0x08;  /* clear SI flag */   
-  }
-  else if(mode == I2C_MODE_ACK1)
-  {
-    /* set ACK=1 (informs slave to send last byte) */
-    I2C_CONCLR = 0x04;     
-    I2C_CONCLR = 0x08; /* clear SI flag */ 
-  }
-  else if(mode == I2C_MODE_READ)
-  {
-    /* check if I2C Data register can be accessed */
-    if((I2C_CONSET & 0x08) != 0)  /* SI = 1 */
-    {
-      /* read data  */
-      *pData = (tU8) I2C_DATA;
+        I2C_CONSET |= 0x04; /* AA=1          */
+        I2C_CONCLR = 0x08;  /* clear SI flag */
     }
-    else
-    {
-      /* No data available */
-      retCode = I2C_CODE_EMPTY;
+    else if (mode == I2C_MODE_ACK1) {
+        /* set ACK=1 (informs slave to send last byte) */
+        I2C_CONCLR = 0x04;
+        I2C_CONCLR = 0x08; /* clear SI flag */
     }
-  }
+    else if (mode == I2C_MODE_READ) {
+        /* check if I2C Data register can be accessed */
+        if ((I2C_CONSET & 0x08) != 0)  /* SI = 1 */
+        {
+            /* read data  */
+            *pData = (tU8)I2C_DATA;
+        }
+        else {
+            /* No data available */
+            retCode = I2C_CODE_EMPTY;
+        }
+    }
 
-  return retCode;
+    return retCode;
 }
 
 /******************************************************************************
@@ -360,187 +334,166 @@ i2cGetChar(tU8  mode,
  *
  *****************************************************************************/
 tS8
-i2cWrite(tU8  addr,
-         tU8* pData,
-         tU16 len)
-{
-  tS8 retCode = 0;
-  tU8 status  = 0;
-  tU8 i       = 0;
+i2cWrite(tU8 addr,
+         tU8 *pData,
+         tU16 len) {
+    tS8 retCode = 0;
+    tU8 status = 0;
+    tU8 i = 0;
 
-  /* generate Start condition */
-  retCode = i2cStart();
+    /* generate Start condition */
+    retCode = i2cStart();
 
-  /* Transmit address */
-  if(retCode == I2C_CODE_OK)
-  {
-    /* write SLA+W */
-    retCode = i2cPutChar(addr);
-    while(retCode == I2C_CODE_BUSY)
-    {
-      retCode = i2cPutChar(addr);
+    /* Transmit address */
+    if (retCode == I2C_CODE_OK) {
+        /* write SLA+W */
+        retCode = i2cPutChar(addr);
+        while (retCode == I2C_CODE_BUSY) {
+            retCode = i2cPutChar(addr);
+        }
     }
-  }
 
-  if(retCode == I2C_CODE_OK)
-  {
-    /* wait until address transmitted and transmit data */
-    for(i = 0; i < len; i++)
-    {
-      /* wait until data transmitted */
+    if (retCode == I2C_CODE_OK) {
+        /* wait until address transmitted and transmit data */
+        for (i = 0; i < len; i++) {
+            /* wait until data transmitted */
 
-      while(1)
-      {
+            while (1) {
+                /* get new status */
+                status = i2cCheckStatus();
+
+                /*
+                 * SLA+W transmitted, ACK received or
+                 * data byte transmitted, ACK received
+                 */
+                if ((status == 0x18) || (status == 0x28)) {
+                    /* Data transmitted and ACK received */
+
+                    /* write data */
+                    retCode = i2cPutChar(*pData);
+                    while (retCode == I2C_CODE_BUSY) {
+                        retCode = i2cPutChar(*pData);
+                    }
+                    pData++;
+
+                    break;
+                }
+
+                    /* no relevant status information */
+                else if (status != 0xf8) {
+                    /* error */
+                    i = len;
+                    retCode = I2C_CODE_ERROR;
+                    break;
+                }
+            }
+        }
+    }
+
+    /* wait until data transmitted */
+    while (1) {
         /* get new status */
         status = i2cCheckStatus();
 
-        /* 
+        /*
          * SLA+W transmitted, ACK received or
          * data byte transmitted, ACK received
          */
-        if( (status == 0x18) || (status == 0x28) )
-        {
-          /* Data transmitted and ACK received */
-
-          /* write data */
-          retCode = i2cPutChar(*pData);
-          while(retCode == I2C_CODE_BUSY)
-          {
-            retCode = i2cPutChar(*pData);
-          }
-          pData++;
-
-          break;
+        if ((status == 0x18) || (status == 0x28)) {
+            /* data transmitted and ACK received */
+            break;
         }
 
-        /* no relevant status information */
-        else if( status != 0xf8 )
-        {
-          /* error */
-          i = len;
-          retCode = I2C_CODE_ERROR;
-          break;
+            /* no relevant status information */
+        else if (status != 0xf8) {
+            /* error */
+            i = len;
+            retCode = I2C_CODE_ERROR;
+            break;
         }
-      }
-    }
-  }
-
-  /* wait until data transmitted */
-  while(1)
-  {
-    /* get new status */
-    status = i2cCheckStatus();
-
-    /* 
-     * SLA+W transmitted, ACK received or
-     * data byte transmitted, ACK received
-     */
-    if( (status == 0x18) || (status == 0x28) )
-    {
-      /* data transmitted and ACK received */
-      break;
     }
 
-    /* no relevant status information */
-    else if(status != 0xf8 )
-    {
-      /* error */
-      i = len;
-      retCode = I2C_CODE_ERROR;
-      break;
-    }
-  }
+    /* generate Stop condition */
+    i2cStop();
 
-  /* generate Stop condition */
-  i2cStop();
-
-  return retCode;
+    return retCode;
 }
 
 tS8
-i2cWaitTransmit(void)
-{
-  tU8 status = 0;
+i2cWaitTransmit(void) {
+    tU8 status = 0;
 
-  /* wait until data transmitted */
-  while(1)
-  {
-    /* get new status */
-    status = i2cCheckStatus();
+    /* wait until data transmitted */
+    while (1) {
+        /* get new status */
+        status = i2cCheckStatus();
 
-    /* 
-     * SLA+W transmitted, ACK received or
-     * data byte transmitted, ACK received
-     */
-    if( (status == 0x18) || (status == 0x28) )
-    {
-      /* data transmitted and ACK received */
-      return I2C_CODE_OK;
+        /*
+         * SLA+W transmitted, ACK received or
+         * data byte transmitted, ACK received
+         */
+        if ((status == 0x18) || (status == 0x28)) {
+            /* data transmitted and ACK received */
+            return I2C_CODE_OK;
+        }
+
+            /* no relevant status information */
+        else if (status != 0xf8) {
+            /* error */
+
+            return I2C_CODE_ERROR;
+        }
     }
-
-    /* no relevant status information */
-    else if(status != 0xf8 )
-    {
-      /* error */
-
-      return I2C_CODE_ERROR;
-    }
-  }
 }
 
 tS8
-i2cWriteWithWait(tU8 data)
-{
-  tS8 retCode = 0;
-  
-  retCode = i2cPutChar(data);
-  while(retCode == I2C_CODE_BUSY)
-  {
+i2cWriteWithWait(tU8 data) {
+    tS8 retCode = 0;
+
     retCode = i2cPutChar(data);
-  }
+    while (retCode == I2C_CODE_BUSY) {
+        retCode = i2cPutChar(data);
+    }
 
-  if(retCode == I2C_CODE_OK)
-    retCode = i2cWaitTransmit();
+    if (retCode == I2C_CODE_OK)
+        retCode = i2cWaitTransmit();
 
-  return retCode;
+    return retCode;
 }
 
 tS8
-i2cMyWrite(tU8  addr,
-           tU8* pData,
-           tU16 len)
-{
-  tS8 retCode = 0;
-  tU8 i       = 0;
+i2cMyWrite(tU8 addr,
+           tU8 *pData,
+           tU16 len) {
+    tS8 retCode = 0;
+    tU8 i = 0;
 
-  do
-  {
-    /* generate Start condition */
-    retCode = i2cStart();
-    if(retCode != I2C_CODE_OK)
-      break;
+    do {
+        /* generate Start condition */
+        retCode = i2cStart();
+        if (retCode != I2C_CODE_OK)
+            break;
 
-    /* write address */
-    retCode = i2cWriteWithWait(addr);
-    if(retCode != I2C_CODE_OK)
-      break;
+        /* write address */
+        retCode = i2cWriteWithWait(addr);
+        if (retCode != I2C_CODE_OK)
+            break;
 
-    for(i = 0; i <len; i++)
-    {
-      retCode = i2cWriteWithWait(*pData);
-      if(retCode != I2C_CODE_OK)
-        break;
+        for (i = 0; i < len; i++) {
+            retCode = i2cWriteWithWait(*pData);
+            if (retCode != I2C_CODE_OK)
+                break;
 
-      pData++;
-    }
+            pData++;
+        }
 
-  } while(0);
+    } while (0);
 
-  /* generate Stop condition */
-  i2cStop();
+    /* generate Stop condition */
+    i2cStop();
 
 
-  return retCode;
+    return retCode;
 }
 
 
@@ -562,85 +515,74 @@ i2cMyWrite(tU8  addr,
  *
  *****************************************************************************/
 tS8
-i2cRead(tU8  addr,
-        tU8* pBuf,
-        tU16 len)
-{
-  tS8 retCode = 0;
-  tU8 status  = 0;
-  tU8 i       = 0;
+i2cRead(tU8 addr,
+        tU8 *pBuf,
+        tU16 len) {
+    tS8 retCode = 0;
+    tU8 status = 0;
+    tU8 i = 0;
 
-  /* Generate Start condition */
-  retCode = i2cStart();
+    /* Generate Start condition */
+    retCode = i2cStart();
 
-  /* Transmit address */
-  if(retCode == I2C_CODE_OK )
-  {
-    /* write SLA+R */
-    retCode = i2cPutChar(addr);
-    while(retCode == I2C_CODE_BUSY)
-    {
-      retCode = i2cPutChar(addr);
-    }
-  }
-
-  if(retCode == I2C_CODE_OK )
-  {
-    /* wait until address transmitted and receive data */
-    for(i = 1; i <= len; i++ )
-    {
-      /* wait until data transmitted */
-      while(1)
-      {
-        /* get new status */
-        status = i2cCheckStatus();
-
-        /*
-         * SLA+R transmitted, ACK received or
-         * SLA+R transmitted, ACK not received
-         * data byte received in master mode, ACK transmitted
-         */
-        if((status == 0x40 ) || (status == 0x48 ) || (status == 0x50 ))
-        {
-          /* data received */
-
-          if(i == len)
-          {
-            /* Set generate NACK */
-            retCode = i2cGetChar(I2C_MODE_ACK1, pBuf);
-          }
-          else
-          {
-            retCode = i2cGetChar(I2C_MODE_ACK0, pBuf);
-          }
-
-          /* Read data */
-          retCode = i2cGetChar(I2C_MODE_READ, pBuf);
-          while(retCode == I2C_CODE_EMPTY)
-          {
-            retCode = i2cGetChar(I2C_MODE_READ, pBuf);
-          }
-          pBuf++;
-
-          break;
+    /* Transmit address */
+    if (retCode == I2C_CODE_OK) {
+        /* write SLA+R */
+        retCode = i2cPutChar(addr);
+        while (retCode == I2C_CODE_BUSY) {
+            retCode = i2cPutChar(addr);
         }
-
-        /* no relevant status information */
-        else if(status != 0xf8 )
-        {
-          /* error */
-          i = len;
-          retCode = I2C_CODE_ERROR;
-          break;
-        }
-      }
     }
-  }
 
-  /*--- Generate Stop condition ---*/
-  i2cStop();
+    if (retCode == I2C_CODE_OK) {
+        /* wait until address transmitted and receive data */
+        for (i = 1; i <= len; i++) {
+            /* wait until data transmitted */
+            while (1) {
+                /* get new status */
+                status = i2cCheckStatus();
 
-  return retCode;
+                /*
+                 * SLA+R transmitted, ACK received or
+                 * SLA+R transmitted, ACK not received
+                 * data byte received in master mode, ACK transmitted
+                 */
+                if ((status == 0x40) || (status == 0x48) || (status == 0x50)) {
+                    /* data received */
+
+                    if (i == len) {
+                        /* Set generate NACK */
+                        retCode = i2cGetChar(I2C_MODE_ACK1, pBuf);
+                    }
+                    else {
+                        retCode = i2cGetChar(I2C_MODE_ACK0, pBuf);
+                    }
+
+                    /* Read data */
+                    retCode = i2cGetChar(I2C_MODE_READ, pBuf);
+                    while (retCode == I2C_CODE_EMPTY) {
+                        retCode = i2cGetChar(I2C_MODE_READ, pBuf);
+                    }
+                    pBuf++;
+
+                    break;
+                }
+
+                    /* no relevant status information */
+                else if (status != 0xf8) {
+                    /* error */
+                    i = len;
+                    retCode = I2C_CODE_ERROR;
+                    break;
+                }
+            }
+        }
+    }
+
+    /*--- Generate Stop condition ---*/
+    i2cStop();
+
+    return retCode;
 }
 
 

@@ -66,16 +66,17 @@
  *****************************************************************************/
 
 /* timer structure */
-typedef struct _tTimer__
-{
-  struct _tTimer__ * next;
-  struct _tTimer__ * previous;
-  struct _tTimer__ * list;
-  void (*callback)(void);
-  tU32 delta;
-  tU32 time;
-  tBool repeat;
-}tTimer;
+typedef struct _tTimer__ {
+    struct _tTimer__ *next;
+    struct _tTimer__ *previous;
+    struct _tTimer__ *list;
+
+    void (*callback)(void);
+
+    tU32 delta;
+    tU32 time;
+    tBool repeat;
+} tTimer;
 #ifndef _OSAPI__h
 /******************************************************************************
  * Public functions
@@ -112,10 +113,10 @@ void timerTick(void);
  *    [in] time     - The initial timer value, specified in system ticks. 
  *
  ****************************************************************************/
-void osCreateTimer(tTimer* pTimer,
-                   void    (*callback) (void),
-                   tBool   repeat,
-                   tU32    time);
+void osCreateTimer(tTimer *pTimer,
+                   void    (*callback)(void),
+                   tBool repeat,
+                   tU32 time);
 
 
 /*****************************************************************************
@@ -136,8 +137,8 @@ void osCreateTimer(tTimer* pTimer,
  *                    not allowed. 
  *
  ****************************************************************************/
-void osDeleteTimer(tTimer* pTimer,
-                   tU8*    pError);
+void osDeleteTimer(tTimer *pTimer,
+                   tU8 *pError);
 
 
 /*****************************************************************************
@@ -159,7 +160,7 @@ void osDeleteTimer(tTimer* pTimer,
  *                        processes). 
  *
  ****************************************************************************/
-void osInitTimers(tU8* pError);
+void osInitTimers(tU8 *pError);
 
 #endif
 #endif

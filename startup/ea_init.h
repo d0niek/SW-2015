@@ -41,6 +41,6 @@
 *     Initializes the evaluation board environment
 * 
 *******************************************************************************/
-extern void eaInit (void);
+extern void eaInit(void);
 
 #endif

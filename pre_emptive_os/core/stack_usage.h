@@ -60,6 +60,7 @@
  *****************************************************************************/
 
 #include "../api/general.h"
+
 #ifndef _OSAPI__h
 /******************************************************************************
  * Public functions
@@ -94,7 +95,7 @@ tU8 osStackUsage(tU8 pid);
  *    [in] size       - The size of the stack area in bytes. 
  *
  ****************************************************************************/
-void createStackPattern(tU8* pStackArea,
+void createStackPattern(tU8 *pStackArea,
                         tU16 size);
 
 
@@ -113,9 +114,9 @@ void createStackPattern(tU8* pStackArea,
  *    TRUE if the stack has grown past the specified limit, else FALSE. 
  *
  ****************************************************************************/
-tBool checkStackLimit(tU8* pStackArea,
+tBool checkStackLimit(tU8 *pStackArea,
                       tU16 size,
-                      tU8  limit);
+                      tU8 limit);
 
 #endif
 #endif
