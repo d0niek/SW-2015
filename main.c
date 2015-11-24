@@ -19,6 +19,7 @@
 #include "lcd.h"
 #include "pca9532.h"
 #include "ea_97x60c.h"
+#include "value.h"
 
 #define LASER_A 0x00100000
 #define LASER_B 0x00400000
@@ -33,8 +34,7 @@ static tU8 initStack[INIT_STACK_SIZE];
 static tU8 pid1;
 static tU8 pid2;
 
-tS32 wejscia = 0, wyjscia = 0;
-tS32 ostatnieWejscia = 0, ostatnieWyjscia = 0;
+Value enters, exits;
 
 static void initProc(void *arg);
 static void proc1(void *arg);
@@ -57,12 +57,12 @@ volatile tU8 rgbSpeed = 10;
  *****************************************************************************/
 void udelay(unsigned int delayInUs)
 {
-    /*
-     * setup timer #1 for delay
-     */
+    // setup timer #1 for delay
     T1TCR = 0x02;          //stop and reset timer
     T1PR = 0x00;          //set prescaler to zero
+
     T1MR0 = (((long) delayInUs - 1) * (long) CORE_FREQ / 1000) / 1000;
+
     T1IR = 0xff;          //reset all interrrupt flags
     T1MCR = 0x04;          //stop timer on match
     T1TCR = 0x01;          //start timer
@@ -87,7 +87,33 @@ int main(void)
     osStartProcess(pid, &error);
 
     osStart();
+
     return 0;
+}
+
+/*****************************************************************************
+ *
+ * Description:
+ *    The entry function for the initialization process.
+ *
+ * Params:
+ *    [in] arg - This parameter is not used in this application.
+ *
+ ****************************************************************************/
+static void initProc(void *arg)
+{
+    tU8 error;
+
+    eaInit();   //initialize printf
+    i2cInit();  //initialize I2C
+
+    osCreateProcess(proc1, proc1Stack, PROC1_STACK_SIZE, &pid1, 3, NULL, &error);
+    osStartProcess(pid1, &error);
+
+    osCreateProcess(proc2, proc2Stack, PROC2_STACK_SIZE, &pid2, 3, NULL, &error);
+    osStartProcess(pid2, &error);
+
+    osDeleteProcess();
 }
 
 /*****************************************************************************
@@ -130,88 +156,82 @@ static void proc1(void *arg)
     IOSET1 = 0x000F0000;
     IODIR1 &= ~0x00F00000;  //Keys
 
-    tS32 wchodze = 0;
-    tS32 wychodze = 0;
-    tS32 prawieWszedl = 0;
-    tS32 prawieWyszedlem = 0;
+    tS32 enter = 0;
+    tS32 exit = 0;
+    tS32 almostEnter = 0;
+    tS32 almostExit = 0;
 
     for (; ;) {
-        tS32 przeciecieA = 0;
-        tS32 przeciecieB = 0;
+        tS32 crossA = 0;
+        tS32 crossB = 0;
 
         static tU8 cnt;
         tU8 rxChar;
 
-        if (wejscia > 999) {
-            printf("Przekroczono max warto�� wej��. Liczenie od 0\n");
-            wejscia = 0;
+        if (enters.current > 999) {
+            printf("Exceeded the maximum value of enters\n");
+            enters.current = 0;
+            enters.setLast();
         }
 
-        if (wyjscia > 999) {
-            printf("Przekroczono max warto�� wyj��. Liczenie od 0\n");
-            wyjscia = 0;
+        if (exits.current > 999) {
+            printf("Exceeded the maximum value of exits\n");
+            exits.current = 0;
+            exits.setLast();
         }
 
-        //detect if P1.20 key is pressed
+        // Detect if P1.20 key is pressed
         if ((IOPIN1 & LASER_A) == 0) {
             IOCLR1 = 0x00010000;
-            przeciecieA = 1;
+            crossA = 1;
         } else {
             IOSET1 = 0x00010000;
         }
 
-        //detect if P1.22 key is pressed
+        // Detect if P1.22 key is pressed
         if ((IOPIN1 & LASER_B) == 0) {
             IOCLR1 = 0x00040000;
-            przeciecieB = 1;
+            crossB = 1;
         } else {
             IOSET1 = 0x00040000;
         }
 
-        if (!wchodze && !wychodze) {
-            //sprawdzenie, kt�re by�o pocz�tkowe przeci�cie (tutaj bramkaA, przeciecieA=1, przeciecieB=0)
-            if (przeciecieA && !przeciecieB) {
-                printf("Wchodze\n");
-                wchodze = 1;
-            }
-                //sprawdzenie, kt�re by�o pocz�tkowe przeci�cie (tutaj bramkaB, przeciecieA=0, przeciecieB=1)
-            else if (!przeciecieA && przeciecieB) {
-                printf("Wychodze\n");
-                wychodze = 1;
+        if (!enter && !exit) {
+            if (crossA && !crossB) {
+                printf("Coming in\n");
+                enter = 1;
+            } else if (!crossA && crossB) {
+                printf("Coming out\n");
+                exit = 1;
             }
         }
 
-        // Sprawdzenie, czy obiekt przecina ostatni� lini� (tutaj bramk�B)
-        if (wchodze && !przeciecieA && przeciecieB) {
-            printf("Prawie wszedlem\n");
-            prawieWszedl = 1;
+        if (enter && !crossA && crossB) {
+            printf("Almost enter\n");
+            almostEnter = 1;
         }
 
-        //sprawdzenie, czy obiekt przecina ostatni� lini� (tutaj bramk�A)
-        if (wychodze && przeciecieA && !przeciecieB) {
-            printf("Prawie wyszed�em\n");
-            prawieWyszedlem = 1;
+        if (exit && crossA && !crossB) {
+            printf("Almost exit\n");
+            almostExit = 1;
         }
 
-        //sprawdzenie, czy nie ma przeci��
-        if (!przeciecieA && !przeciecieB) {
-            wchodze = 0; //zerowanie pomocnik�w
-            wychodze = 0; //zerowanie pomocnik�w
+        if (!crossA && !crossB) {
+            enter = 0;
+            exit = 0;
 
-            // je�li by�o prawieWszed�=1, tutaj jest koniec wej�cia
-            if (prawieWszedl) {
-                printf("Wszed�em ++ \n");
-                prawieWszedl = 0; // zerowanie pomocnik�w
-                wejscia += 1;
+            if (almostEnter) {
+                printf("Entered\n");
+                almostEnter = 0;
+                enters.current += 1;
                 IOCLR = 0x00040000; // zapali si� niebieska dioda RGB
                 udelay(300);
             }
 
-            // je�li by�o prawieWyszed�=1, tutaj jest koniec wyj�cia
-            if (prawieWyszedlem) {
-                printf("Wyszed�em -- \n");
-                prawieWyszedlem = 0; // zerowanie pomocnik�w
-                wyjscia += 1;
+            if (almostExit) {
+                printf("Went\n");
+                almostExit = 0;
+                exits.current += 1;
                 IOCLR = 0x00020000; // zapalenie diody rgb - Czerwona
                 udelay(300);
             }
@@ -283,43 +303,19 @@ static void proc2(void *arg)
     for (; ;) {
         osSleep(10);
         if (TRUE == pca9532Present) {
-            if (wejscia != ostatnieWejscia) {
-                displayResult(wejscia, 1);
-                ostatnieWejscia = wejscia;
+            if (enters.current != enters.last) {
+                displayResult(enters.current, 1);
+                enters.setLast();
             }
 
-            if (wyjscia != ostatnieWyjscia) {
-                displayResult(wyjscia, 2);
-                ostatnieWyjscia = wyjscia;
+            if (exits.current != exits.last) {
+                displayResult(exits.current, 2);
+                exits.setLast();
             }
         } else {
             rgbSpeed = (getAnalogueInput(AIN1) >> 7) + 3;
         }
     }
-}
-
-/*****************************************************************************
- *
- * Description:
- *    The entry function for the initialization process.
- *
- * Params:
- *    [in] arg - This parameter is not used in this application.
- *
- ****************************************************************************/
-static void initProc(void *arg)
-{
-    tU8 error;
-
-    eaInit();   //initialize printf
-    i2cInit();  //initialize I2C
-
-    osCreateProcess(proc1, proc1Stack, PROC1_STACK_SIZE, &pid1, 3, NULL, &error);
-    osStartProcess(pid1, &error);
-    osCreateProcess(proc2, proc2Stack, PROC2_STACK_SIZE, &pid2, 3, NULL, &error);
-    osStartProcess(pid2, &error);
-
-    osDeleteProcess();
 }
 
 /*****************************************************************************

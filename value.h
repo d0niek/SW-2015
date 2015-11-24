@@ -12,10 +12,14 @@ struct Value
     tS32 current;
     tS32 last;
 
-    void setCurrent(tS32 current)
+    Value() :
+        current(0), last(0)
+    {
+    }
+
+    void setLast()
     {
         this->last = this->current;
-        this->current = current;
     }
 };
 
