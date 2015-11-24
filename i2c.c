@@ -71,7 +71,8 @@
  *      FFh Channel error
  *
  *****************************************************************************/
-tU8 i2cCheckStatus(void)
+tU8
+i2cCheckStatus(void)
 {
   tU8 status = 0;
 

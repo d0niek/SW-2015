@@ -1,6 +1,6 @@
 #ifndef _I2C_H
 #define _I2C_H
-#include <general.h>
+
 /* modes */
 #define I2C_MODE_ACK0 0
 #define I2C_MODE_ACK1 1
@@ -87,7 +87,7 @@
 
 
 
-tU8 i2cCheckStatus(void);
+tU8  i2cCheckStatus(void);
 void i2cInit(void);
 tS8  i2cStart(void);
 tS8  i2cRepeatStart(void);
@@ -96,7 +96,7 @@ tS8  i2cPutChar(tU8 data);
 tS8  i2cGetChar(tU8  mode, tU8* pData);
 tS8  i2cWrite(tU8  addr, tU8* pData, tU16 len);
 tS8  i2cRead(tU8  addr, tU8* pBuf, tU16 len);
-tS8  i2cWriteWithWait(tU8 data);
+
 
 
 

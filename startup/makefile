@@ -79,18 +79,9 @@ DOWNLOAD    = lpc21isp.exe
 
 # Configurations for download program
 DL_COMPORT  = com1
-DL_BAUDRATE = 115200
-DL_CRYSTAL  = 14746
+DL_BAUDRATE = 38400
+DL_CRYSTAL  = 12000
 
 #######################################################################
 include ../build_files/general.mk
 #######################################################################
-
-# NOTE: This flag is currently not used. Will be in a future release.
-# Link program to RAM or ROM (possible values for LD_RAMROM is RAM or ROM,
-# if not specified = ROM)
-#LD_RAMROM = ROM
-
-# NOTE: This flag is currently not used. Will be in a future release.
-# Name if specific CPU used (used by linker scripts to define correct memory map)
-#CPU_VAR   = LPC2138

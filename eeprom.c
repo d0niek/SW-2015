@@ -33,8 +33,7 @@
  *    I2C_CODE_OK or I2C_CODE_ERROR
  *
  *****************************************************************************/
-/*
- tS8 
+tS8 
 eepromPoll(void)
 {
   tS8 retCode  = I2C_CODE_OK;
@@ -43,13 +42,13 @@ eepromPoll(void)
 
   while(burnEnd == FALSE)
   {
-    // Generate Start condition 
+    /* Generate Start condition */
     retCode = i2cStart();
 
-    // Transmit SLA+W 
+    /* Transmit SLA+W */
     if(retCode == I2C_CODE_OK)
     {
-      // Write SLA+W 
+      /* Write SLA+W */
       retCode = i2cPutChar(I2C_EEPROM_SND);
       while(retCode == I2C_CODE_BUSY)
       {
@@ -59,30 +58,30 @@ eepromPoll(void)
 
     if(retCode == I2C_CODE_OK)
     {
-      // Wait until SLA+W transmitted 
-      // Get new status 
+      /* Wait until SLA+W transmitted */
+      /* Get new status */
       status = i2cCheckStatus();
 
       if(status == 0x18)
       {
-        // data transmitted and ACK received 
+        /* data transmitted and ACK received */
         burnEnd = TRUE;
       }
       else if(status == 0x20)
       {
-        // data transmitted and ACK not received 
+        /* data transmitted and ACK not received */
         // send start bit, start again
         burnEnd = FALSE;
       }
       else if( status != 0xf8 )
       {
-        // error ---
+        /* error ---*/
         retCode = I2C_CODE_ERROR;
         burnEnd = TRUE;
       }
     }
 
-    // Generate Stop condition 
+    /* Generate Stop condition */
     i2cStop();
 
   } // end of while 
@@ -91,7 +90,7 @@ eepromPoll(void)
   return retCode;
 
 }
-*/
+
 /******************************************************************************
  *
  * Description:
@@ -105,22 +104,20 @@ eepromPoll(void)
  *    I2C_CODE_OK or I2C_CODE_ERROR
  *
  *****************************************************************************/
-/*
- tS8 
+tS8 
 eepromStartRead(tU8  devAddr, 
                 tU16 address)
 {
   tS8 retCode = 0;
   tU8 status  = 0;
 
-  // Generate Start condition
-  
+  /* Generate Start condition */
   retCode = i2cStart();
 
-  // Transmit address
+  /* Transmit address */
   if(retCode == I2C_CODE_OK )
   {
-    // Write SLA+W
+    /* Write SLA+W */
     retCode = i2cPutChar(devAddr);
     while( retCode == I2C_CODE_BUSY )
     {
@@ -131,18 +128,18 @@ eepromStartRead(tU8  devAddr,
   if( retCode == I2C_CODE_OK )
   {
 #if 0
-    // Wait until data transmitted 
+    /* Wait until data transmitted */
     while(1)
     {
-      // Get new status 
+      /* Get new status */
       status = i2cCheckStatus();
 
       if( (status == 0x18) || (status == 0x28) )
       {
-        // Data transmitted and ACK received
+        /* Data transmitted and ACK received */
 
 
-        // Write data
+        /* Write data */
         retCode = i2cPutChar( (tU8)(address >> 8) );
         while(retCode == I2C_CODE_BUSY)
         {
@@ -152,7 +149,7 @@ eepromStartRead(tU8  devAddr,
       }
       else if(status != 0xf8)
       {
-        // error
+        /* error */
         retCode = I2C_CODE_ERROR;
         break;
       }
@@ -161,18 +158,18 @@ eepromStartRead(tU8  devAddr,
 
     if(retCode == I2C_CODE_OK)
     {
-      // Wait until data transmitted
+      /* Wait until data transmitted */
       while(1)
       {
-        // Get new status
+        /* Get new status */
         status = i2cCheckStatus();
 
         if( (status == 0x18) || (status == 0x28) )
         {
-          // Data transmitted and ACK received
+          /* Data transmitted and ACK received */
 
 
-          // Write data
+          /* Write data */
           retCode = i2cPutChar( (tU8)(address & 0xff) );
           while( retCode == I2C_CODE_BUSY )
           {
@@ -183,7 +180,7 @@ eepromStartRead(tU8  devAddr,
         }
         else if( status != 0xf8 )
         {
-          //  error
+          /*  error */
           retCode = I2C_CODE_ERROR;
           break;
         }
@@ -191,32 +188,32 @@ eepromStartRead(tU8  devAddr,
     }
   }
 
-  //Wait until data transmitted
+  /* Wait until data transmitted */
   while(1)
   {
-    // Get new status
+    /* Get new status */
     status = i2cCheckStatus();
 
     if(status == 0x28)
     {
-      // Data transmitted and ACK received
+      /* Data transmitted and ACK received */
       break;
     }
     else if( status != 0xf8 )
     {
-      // error 
+      /* error */
       retCode = I2C_CODE_ERROR;
       break;
     }
   }
 
-  //Generate Start condition
+  /* Generate Start condition */
   retCode = i2cRepeatStart();
 
-  // Transmit device address
+  /* Transmit device address */
   if( retCode == I2C_CODE_OK)
   {
-    // Write SLA+R
+    /* Write SLA+R */
     retCode = i2cPutChar( devAddr + 0x01 );
     while( retCode == I2C_CODE_BUSY )
     {
@@ -224,20 +221,20 @@ eepromStartRead(tU8  devAddr,
     }
   }
 
-  // Wait until SLA+R transmitted
+  /* Wait until SLA+R transmitted */
   while(1)
   {
-    // Get new status
+    /* Get new status */
     status = i2cCheckStatus();
 
     if(status == 0x40)
     {
-      // Data transmitted and ACK received
+      /* Data transmitted and ACK received */
       break;
     }
     else if(status != 0xf8)
     {
-      // error
+      /* error */
       retCode = I2C_CODE_ERROR;
       break;
     }
@@ -275,28 +272,28 @@ eepromPageRead(tU16 address,
   tU8  status  = 0;
   tU16 i       = 0;
 
-  // Write 4 bytes, see 24C256 Random Read
+  /* Write 4 bytes, see 24C256 Random Read */
   retCode = eepromStartRead(I2C_EEPROM_ADDR, address);
 
 
   if( retCode == I2C_CODE_OK )
   {
-    // wait until address transmitted and receive data
+    /* wait until address transmitted and receive data */
     for(i = 1; i <= len; i++ )
     {
-      // wait until data transmitted
+      /* wait until data transmitted */
       while(1)
       {
-        // Get new status
+        /* Get new status */
         status = i2cCheckStatus();
 
         if(( status == 0x40 ) || ( status == 0x48 ) || ( status == 0x50 ))
         {
-          // Data received
+          /* Data received */
 
           if(i == len )
           {
-            // Set generate NACK
+            /* Set generate NACK */
             retCode = i2cGetChar( I2C_MODE_ACK1, pBuf );
           }
           else
@@ -304,7 +301,7 @@ eepromPageRead(tU16 address,
             retCode = i2cGetChar( I2C_MODE_ACK0, pBuf );
           }
 
-          // Read data
+          /* Read data */
           retCode = i2cGetChar( I2C_MODE_READ, pBuf );
           while( retCode == I2C_CODE_EMPTY )
           {
@@ -316,7 +313,7 @@ eepromPageRead(tU16 address,
         }
         else if( status != 0xf8 )
         {
-          // ERROR
+          /* ERROR */
           i = len;
           retCode = I2C_CODE_ERROR;
           break;
@@ -325,7 +322,7 @@ eepromPageRead(tU16 address,
     }
   }
 
-  // Generate Stop condition
+  /* Generate Stop condition */
   i2cStop();
 
   return retCode;
@@ -345,31 +342,31 @@ eepromWrite(tU16 addr,
   do
   {
 
-    // generate Start condition
+    /* generate Start condition */
     retCode = i2cStart();
     if(retCode != I2C_CODE_OK)
       break;
 
 
-    // write EEPROM I2C address
+    /* write EEPROM I2C address */
     retCode = i2cWriteWithWait(I2C_EEPROM_ADDR);
     if(retCode != I2C_CODE_OK)
       break;
 
 #if 0
-    // write offset high in EEPROM space  
+    /* write offset high in EEPROM space  */
     retCode = i2cWriteWithWait( (tU8)(addr >> 8));
     if(retCode != I2C_CODE_OK)
       break;
 #endif
 
-    // write offset low in EEPROM space  
+    /* write offset low in EEPROM space  */
     retCode = i2cWriteWithWait( (tU8)(addr & 0xFF));
     if(retCode != I2C_CODE_OK)
       break;
 
 
-    // write data 
+    /* write data */
     for(i = 0; i <len; i++)
     {
       retCode = i2cWriteWithWait(*pData);
@@ -381,13 +378,13 @@ eepromWrite(tU16 addr,
 
   } while(0);
 
-  // generate Stop condition 
+  /* generate Stop condition */
   i2cStop();
 
 
   return retCode;
 }
-*/
+
 /******************************************************************************
  *
  * Description:

@@ -423,7 +423,7 @@
 #define CTIME1         (*((volatile unsigned long *) 0xE0024018))
 #define CTIME2         (*((volatile unsigned long *) 0xE002401C))
 #define SEC            (*((volatile unsigned long *) 0xE0024020))
-#define MIN            (*((volatile unsigned long *) 0xE0024024))
+#define MINx            (*((volatile unsigned long *) 0xE0024024))
 #define HOUR           (*((volatile unsigned long *) 0xE0024028))
 #define DOM            (*((volatile unsigned long *) 0xE002402C))
 #define DOW            (*((volatile unsigned long *) 0xE0024030))

@@ -15,13 +15,13 @@
  * Defines, macros, and typedefs
  *****************************************************************************/
 
-#define FOSC 14745600                 /* External clock input frequency (must be between 10 MHz and 25 MHz) */
+#define FOSC 14745000                 /* External clock input frequency (must be between 10 MHz and 25 MHz) */
 
 #define USE_PLL 1                     /* 0 = do not use on-chip PLL,
                                          1 = use on-chip PLL) */
 #define PLL_MUL 4                     /* PLL multiplication factor (1 to 32) */
 #define PLL_DIV 2                     /* PLL division factor (1, 2, 4, or 8) */
-#define PBSD    4                     /* Peripheral bus speed divider (1, 2, or 4) */
+#define PBSD    1                     /* Peripheral bus speed divider (1, 2, or 4) */
 
 /* initialize the MAM (Memory Accelerator Module) */
 #if USE_PLL == 1
@@ -42,7 +42,7 @@
                                          1=partly enabled (enabled for code prefetch, but not for data),
                                          2=fully enabled */
 
-#define IRQ_HANDLER  1                /* 0 = Jump to common IRQ handler
+#define IRQ_HANDLER  0                /* 0 = Jump to common IRQ handler
                                          1 = Load vector directly from VIC, i.e., LDR PC,[PC,#-0xFF0] */
 
 /* initialize the exception vector mapping */
@@ -58,7 +58,7 @@
 #define stackSize_SVC     64
 #define stackSize_UND     64
 #define stackSize_ABT     64
-#define stackSize_IRQ    600
+#define stackSize_IRQ   1024
 #define stackSize_FIQ     64
 
 /* define consol settings */
@@ -77,7 +77,7 @@
                                     1 = use newlib = full implementation of printf(), scanf(), and malloc() */
 #define CONSOLE_API_PRINTF   1   /* 0 = printf() = sendString,
                                     1 = simple, own implementation of printf() */
-#define CONSOLE_API_SCANF    0   /* 0 = none,
+#define CONSOLE_API_SCANF    1   /* 0 = none,
                                     1 = simple, own implementation of scanf() */
 
 /* define SRAM size */

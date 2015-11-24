@@ -1,71 +1,360 @@
-#include "i2c.h"
-#include "pca9532.h"
-#include "lcd.h"
-#include "adc.h"
-#include "general.h"
-#include <lpc2xxx.h>
-#include <printf_P.h>
-#include <ea_init.h>
-#include "startup/config.h"
-
-#define bramkaA 	1<<15 	//ustawienie pinu dla pierwszego fototranzystora
-#define bramkaB		1<<10 	//ustawienie pinu dla drugiego fototranzystora
-#define STEP_DELAY	1	//ustawienie ile ms opóŸnienia
-#define KEY_DELAY	4000	//ustawienie opóŸnienia dla przycisku (4s)
-#define przycisk     1<<20 //przycisk P1.20;
-
-/*****************************************************************************
+/******************************************************************************
+ *
+ * Copyright:
+ *    (C) 2000 - 2007 Embedded Artists AB
  *
  * Description:
- *    OpóŸnienie
+ *    Main program for LPC2148 Education Board test program
  *
- ****************************************************************************/
-static void
-delayMs(tU16 delayInMs)
+ *****************************************************************************/
+
+#include "pre_emptive_os/api/osapi.h"
+#include "pre_emptive_os/api/general.h"
+#include <printf_P.h>
+#include <ea_init.h>
+#include <lpc2xxx.h>
+#include <consol.h>
+#include "i2c.h"
+#include "adc.h"
+#include "lcd.h"
+#include "pca9532.h"
+#include "ea_97x60c.h"
+
+#define BRAMKA_A 0x00100000
+#define BRAMKA_B 0x00400000
+
+#define PROC1_STACK_SIZE 1024
+#define PROC2_STACK_SIZE 1024
+#define INIT_STACK_SIZE  400
+
+static tU8 proc1Stack[PROC1_STACK_SIZE];
+static tU8 proc2Stack[PROC2_STACK_SIZE];
+static tU8 initStack[INIT_STACK_SIZE];
+static tU8 pid1;
+static tU8 pid2;
+
+tS32 wejscia = 0, wyjscia = 0;
+tS32 ostatnieWejscia = 0, ostatnieWyjscia = 0;
+
+static void proc1(void* arg);
+static void proc2(void* arg);
+static void initProc(void* arg);
+void rgbLight();
+static void wyswietlWynik(tS32 wynik, tS32 pozycja);
+
+volatile tU32 msClock;
+volatile tU8 killProc1 = FALSE;
+volatile tU8 rgbSpeed = 10;
+
+/******************************************************************************
+** Function name:		udelay
+**
+** Descriptions:		
+**
+** parameters:			delay length
+** Returned value:		None
+** 
+******************************************************************************/
+void udelay( unsigned int delayInUs )
 {
   /*
    * setup timer #1 for delay
    */
   T1TCR = 0x02;          //stop and reset timer
   T1PR  = 0x00;          //set prescaler to zero
-  T1MR0 = delayInMs * (CORE_FREQ / PBSD / 1000);
+  T1MR0 = (((long)delayInUs-1) * (long)CORE_FREQ/1000) / 1000;
   T1IR  = 0xff;          //reset all interrrupt flags
   T1MCR = 0x04;          //stop timer on match
   T1TCR = 0x01;          //start timer
   
+  //wait until delay time has elapsed
   while (T1TCR & 0x01)
     ;
+}
+/*****************************************************************************
+ *
+ * Description:
+ *    The first function to execute 
+ *
+ ****************************************************************************/
+int main(void)
+{
+  tU8 error;
+  tU8 pid;
+
+  osInit();
+  osCreateProcess(initProc, initStack, INIT_STACK_SIZE, &pid, 1, NULL, &error);
+  osStartProcess(pid, &error);
+  
+  osStart();
+  return 0;
 }
 
 /*****************************************************************************
  *
  * Description:
- *    Zapala/Gasi diody, w zale¿noœci od 'stan', dodatkowo opóŸnienie
+ *    A process entry function 
+ *
+ * Params:
+ *    [in] arg - This parameter is not used in this application. 
  *
  ****************************************************************************/
-static void
-zapalanie(tU8 stan)
+static void proc1(void* arg)
 {
-	setPca9532Pin(0, stan); //zapalenie lewej górnej diody
-	setPca9532Pin(7, stan); //zapalenie lewej dolnej diody
-	setPca9532Pin(8, stan); //zapalenie prawej górnej diody
-	setPca9532Pin(15, stan); //zapalenie prawej dolnej diody
-    delayMs(STEP_DELAY); //opóŸnienie
-	setPca9532Pin(1, stan);
-	setPca9532Pin(6, stan);
-	setPca9532Pin(9, stan);
-	setPca9532Pin(14, stan);
-    delayMs(STEP_DELAY);
-	setPca9532Pin(2, stan);
-	setPca9532Pin(5, stan);
-	setPca9532Pin(10, stan);
-	setPca9532Pin(13, stan);
-	delayMs(STEP_DELAY);
-	setPca9532Pin(3, stan);
-	setPca9532Pin(4, stan);
-	setPca9532Pin(11, stan);
-	setPca9532Pin(12, stan);
-	delayMs(STEP_DELAY);
+  printf("\n\n");
+  printf("*******************************************************\n");
+  printf("*                                                     *\n");
+  printf("* Licznik osób                                        *\n");
+  printf("* LPC2138 Education Board v1.1 (2009-05-06).          *\n");
+  printf("*                                                     *\n");
+  printf("* (C) G&C 2015                                        *\n");
+  printf("*                                                     *\n");
+  printf("*******************************************************\n");
+
+  IODIR |= 0x00008000;  //P0.15
+
+  IODIR |= 0x00260000;  //RGB
+  IOSET  = 0x00260000;
+
+  IODIR1 |= 0x000F0000;  //LEDs
+  IOSET1  = 0x000F0000;
+  osSleep(25);
+  IOCLR1  = 0x00030000;
+  osSleep(20);
+  IOCLR1  = 0x00050000;
+  osSleep(15);
+  IOCLR1  = 0x000c0000;
+  osSleep(10);
+  IOCLR1  = 0x00090000;
+  osSleep(5);
+  IOSET1  = 0x000F0000;
+  IODIR1 &= ~0x00F00000;  //Keys
+    
+	tS32 wchodze = 0;
+	tS32 wychodze = 0;
+	tS32 prawieWszedl = 0;
+	tS32 prawieWyszedlem = 0;
+
+	for(;;) {
+		tS32 przeciecieA = 0;
+		tS32 przeciecieB = 0;
+
+		static tU8 cnt;
+		tU8 rxChar;
+
+		if (wejscia > 999) {
+			printf("Przekroczono max wartoœæ wejœæ. Liczenie od 0\n");
+			wejscia = 0;
+		}
+
+		if (wyjscia > 999) {
+			printf("Przekroczono max wartoœæ wyjœæ. Liczenie od 0\n");
+			wyjscia = 0;
+		}
+
+		//detect if P1.20 key is pressed
+		if ((IOPIN1 & BRAMKA_A) == 0) {
+			IOCLR1 = 0x00010000;
+			przeciecieA = 1;
+		} else {
+			IOSET1 = 0x00010000;
+		}
+
+		//detect if P1.22 key is pressed
+		if ((IOPIN1 & BRAMKA_B) == 0) {
+			IOCLR1 = 0x00040000;
+			przeciecieB = 1;
+		} else {
+			IOSET1 = 0x00040000;
+		}
+
+		if (!wchodze && !wychodze) {
+			//sprawdzenie, które by³o pocz±tkowe przeciêcie (tutaj bramkaA, przeciecieA=1, przeciecieB=0)
+			if (przeciecieA && !przeciecieB) {
+				printf("Wchodze\n");
+				wchodze = 1;
+			}
+			//sprawdzenie, które by³o pocz±tkowe przeciêcie (tutaj bramkaB, przeciecieA=0, przeciecieB=1)
+			else if (!przeciecieA && przeciecieB) {
+				printf("Wychodze\n");
+				wychodze = 1;
+			}
+		}
+
+		// Sprawdzenie, czy obiekt przecina ostatni± liniê (tutaj bramkêB)
+		if (wchodze && !przeciecieA && przeciecieB) {
+			printf("Prawie wszedlem\n");
+			prawieWszedl = 1;
+		}
+
+		//sprawdzenie, czy obiekt przecina ostatni± liniê (tutaj bramkêA)
+		if (wychodze && przeciecieA && !przeciecieB) {
+			printf("Prawie wyszed³em\n");
+			prawieWyszedlem = 1;
+		}
+
+		//sprawdzenie, czy nie ma przeciêæ
+		if (!przeciecieA && !przeciecieB) {
+			wchodze = 0; //zerowanie pomocników
+			wychodze = 0; //zerowanie pomocników
+
+			// je¿li by³o prawieWszed³=1, tutaj jest koniec wej¶cia
+			if (prawieWszedl) {
+				printf("Wszed³em ++ \n");
+				prawieWszedl = 0; // zerowanie pomocników
+				wejscia += 1;
+				IOCLR = 0x00040000; // zapali siê niebieska dioda RGB
+				udelay(300);
+			}
+
+			// je¿li by³o prawieWyszed³=1, tutaj jest koniec wyj¶cia
+			if (prawieWyszedlem) {
+				printf("Wyszed³em -- \n");
+				prawieWyszedlem = 0; // zerowanie pomocników
+				wyjscia += 1;
+				IOCLR = 0x00020000; // zapalenie diody rgb - Czerwona
+				udelay(300);
+			}
+		}
+
+		// rgbLight();
+
+		//echo terminal
+		if (TRUE == consolGetChar(&rxChar)) {
+			consolSendCh(rxChar);
+		}
+
+		osSleep(5);
+
+		if (TRUE == killProc1) {
+			printf("\nProc #1 kill itself!!!\n");
+			osDeleteProcess();
+		}
+	}
+}
+
+/*****************************************************************************
+ *
+ * Description:
+ *    A process entry function
+ *
+ * Params:
+ *    [in] arg - This parameter is not used in this application.
+ *
+ ****************************************************************************/
+static void proc2(void* arg)
+{
+	tU8 pca9532Present = FALSE;
+
+	osSleep(50);
+
+	//check if connection with PCA9532
+	pca9532Present = pca9532Init();
+
+	if (TRUE == pca9532Present) {
+		lcdInit();
+		lcdColor(0xff,0x00);
+		lcdClrscr();
+		lcdIcon(16, 0, 97, 60, _ea_97x60c[2], _ea_97x60c[3], &_ea_97x60c[4]);
+
+		lcdGotoxy(16,66);
+		lcdPuts("Designed and");
+
+		lcdGotoxy(20,80);
+		lcdPuts("produced by");
+
+		lcdGotoxy(0,96);
+		lcdPuts("G&C");
+
+		lcdGotoxy(8,112);
+		lcdPuts("(C)2015 (v1.1)");
+	}
+
+	//Initialize ADC
+	initAdc();
+
+	T1TCR = 0;            // counter disable
+	T1PR  = 0;            // set prescaler /1
+	T1MCR = 0;            // disable match act
+	T1EMR = 0;            // disable external match act
+	IOSET1  = ((1UL<<25) | (1UL<<24));
+	IODIR1 |= ((1UL<<25) | (1UL<<24));
+
+	for(;;) {
+		osSleep(10);
+		if (TRUE == pca9532Present) {
+			if (wejscia != ostatnieWejscia) {
+				wyswietlWynik(wejscia, 1);
+				ostatnieWejscia = wejscia;
+			}
+
+			if (wyjscia != ostatnieWyjscia) {
+				wyswietlWynik(wyjscia, 2);
+				ostatnieWyjscia = wyjscia;
+			}
+		} else {
+			rgbSpeed = (getAnalogueInput(AIN1) >> 7) + 3;
+		}
+	}
+}
+
+/*****************************************************************************
+ *
+ * Description:
+ *    The entry function for the initialization process. 
+ *
+ * Params:
+ *    [in] arg - This parameter is not used in this application. 
+ *
+ ****************************************************************************/
+static void initProc(void* arg)
+{
+  tU8 error;
+
+  eaInit();   //initialize printf
+  i2cInit();  //initialize I2C
+
+  osCreateProcess(proc1, proc1Stack, PROC1_STACK_SIZE, &pid1, 3, NULL, &error);
+  osStartProcess(pid1, &error);
+  osCreateProcess(proc2, proc2Stack, PROC2_STACK_SIZE, &pid2, 3, NULL, &error);
+  osStartProcess(pid2, &error);
+
+  osDeleteProcess();
+}
+
+/*****************************************************************************
+ *
+ * Description:
+ *    The timer tick entry function that is called once every timer tick
+ *    interrupt in the RTOS. Observe that any processing in this
+ *    function must be kept as short as possible since this function
+ *    execute in interrupt context.
+ *
+ * Params:
+ *    [in] elapsedTime - The number of elapsed milliseconds since last call.
+ *
+ ****************************************************************************/
+void appTick(tU32 elapsedTime)
+{
+  msClock += elapsedTime;
+}
+
+void rgbLight()
+{
+	static tU8 cnt;
+
+	cnt++;
+	if ((cnt % rgbSpeed) == 0) {
+		IOSET = 0x00260000;
+		if (cnt == rgbSpeed) {
+			IOCLR = 0x00020000;
+		} else if (cnt == (2*rgbSpeed)) {
+			IOCLR = 0x00040000;
+		} else {
+			IOCLR = 0x00200000;
+			cnt = 0;
+		}
+	}
 }
 
 /*****************************************************************************
@@ -82,161 +371,9 @@ static void wyswietlWynik(tS32 wynik, tS32 pozycja) //wy¶wietlanie wyniku dla wy
 	liczChar[1] = (wynik-((wynik/100)*100))/10 + '0';
 	liczChar[2] = wynik%10 + '0';
 	consolSendString("Licznik \n");
-	consolSendString(liczChar); 
+	consolSendString(liczChar);
 	consolSendString("\n");
 	lcdGotoxy(20,pozycja*40);
 	lcdColor(0xA1,0x00);
 	lcdPuts(liczChar);
-}
-
-/*****************************************************************************
- *
- * Description:
- *    G³ówna funkcja programu
- *
- ****************************************************************************/
-int main(void) 
-{
-	tS32 wejscia = 0, wyjscia = 0, ostatniStanPrzycisku = 0;	
-	tS32 wchodze = 0;
-	tS32 wychodze = 0;
-	tS32 prawieWszedl = 0;
-	tS32 prawieWyszedlem = 0;
-
-	// initializacja UART
-	consolInit();
-
-	//diody led, inicjalizacja i2c
-	i2cInit();
-	pca9532Init();
-			
-	/*Ustawienie pinów fototranzystorów na wejœcie*/
-	IODIR0 &= ~bramkaA;
-	IODIR0 &= ~bramkaB;
-	
-	/*Ustawienie przycisku P1.20 jako wejœcie*/
-	IODIR1 &= ~przycisk;
-	
-	/*RGB*/
-	IODIR |= 0x00260000; //ustawienie diod rgb jako wyj¶cie
-	IOSET  = 0x00260000; //wy³±czenie diod rgb
-
-	//Tekst niezmienialny na wy¶wietlacz:
-	lcdInit(); //inicjalizujemy wy¶wietlacz
-	lcdColor(0,0); //ustawiamy kolor
-	lcdClrscr(); //czy¶cimy wy¶wietlacz
-	lcdGotoxy(2,20); //pozycja X,Y
-  	lcdColor(0xA1,0xB0);
-	lcdPuts("Ilosc wejsc:");
-	lcdGotoxy(2,60);
-  	lcdColor(0xA1,0xB0);
-	lcdPuts("Ilosc wyjsc:");
-	
-	wyswietlWynik(wejscia, 1); //wy¶wietlenie wyniku wej¶æ, =0
-	wyswietlWynik(wyjscia, 2); //wy¶wietlenie wyniku wyj¶æ, =0
-	
-	while (1) 
-	{
-		tS32 przeciecieA = 0;
-		tS32 przeciecieB = 0;
-		IOSET = 0x00260000; //stan niski dla RGB, wy³±czenie diody
-		
-		if(wejscia>999)
-		{
-		consolSendString("Przekroczono max wartoœæ wejœæ. Liczenie od 0");
-		wejscia = 0;
-		}
-	
-		if(wyjscia>999)
-		{
-		consolSendString("Przekroczono max wartoœæ wyjœæ. Liczenie od 0");
-		wyjscia = 0;
-		}
-		
-		if (((IOPIN1 & przycisk) == 0) && (ostatniStanPrzycisku==0)) //sprawdzenie, czy stan przycisku jest wysoki
-												//i czy jego ostatni stan by³ == 0
-		{	
-			delayMs(KEY_DELAY); //opóŸnienie;
-			if((IOPIN1 & przycisk) == 0) //ponowne sprawdzenie stanu
-			{
-				wejscia = 0;
-				wyjscia = 0;
-				wyswietlWynik(wejscia, 1);
-				wyswietlWynik(wyjscia, 2);
-				ostatniStanPrzycisku=1;
-				consolSendString("Zerowanie liczników\n");
-				IOCLR = 0x00200000; //zielona dioda rgb
-				delayMs(300);
-				
-			}
-		}
-		if((IOPIN1 & przycisk) != 0) 
-		{
-			ostatniStanPrzycisku=0;
-		}
-		
-		/**FOTOTRANZYSTOR**/
-		if ((IOPIN & bramkaA) != 0) //sprawdzanie, czy jest przeciêcie linii ¶wiat³a
-		{	
-			przeciecieA = 1;
-			zapalanie(0); //zapalanie diod
-			zapalanie(1); //gaszenie diod
-		}
-		
-		if((IOPIN & bramkaB) != 0) //sprawdzanie, czy jest przeciêcie linii ¶wiat³a
-		{	
-			przeciecieB = 1;
-			zapalanie(0); //zapalanie diod
-			zapalanie(1); //gaszenie diod
-		}
-
-		if (!wchodze && !wychodze) 
-		{
-			if (przeciecieA && !przeciecieB) //sprawdzenie, które by³o pocz±tkowe przeciêcie (tutaj bramkaA, przeciecieA=1, przeciecieB=0)
-			{	
-				consolSendString("Wchodzê \n"); //wysy³anie tekstu przez UART
-				wchodze = 1;
-			} 
-			else if (!przeciecieA && przeciecieB) //sprawdzenie, które by³o pocz±tkowe przeciêcie (tutaj bramkaB, przeciecieA=0, przeciecieB=1)
-			{	
-				consolSendString("Wychodzê \n");
-				wychodze = 1;
-			}
-		}
-
-		if (wchodze && !przeciecieA && przeciecieB) //sprawdzenie, czy obiekt przecina ostatni± liniê (tutaj bramkêB)
-		{	
-			consolSendString("Prawie wszed³em \n");
-			prawieWszedl = 1;
-		}
-		if (wychodze && przeciecieA && !przeciecieB) //sprawdzenie, czy obiekt przecina ostatni± liniê (tutaj bramkêA)
-		{	
-			consolSendString("Prawie wyszed³em \n");
-			prawieWyszedlem = 1;
-		}	
-
-		if (!przeciecieA && !przeciecieB) //sprawdzenie, czy nie ma przeciêæ
-		{	
-			wchodze = 0; //zerowanie pomocników
-			wychodze = 0;	//zerowanie pomocników
-			if (prawieWszedl) //je¶li by³o prawieWszed³=1, tutaj jest koniec wej¶cia
-			{	
-				consolSendString("Wszed³em ++ \n");
-				prawieWszedl = 0; //zerowanie pomocników
-				wejscia += 1;
-				wyswietlWynik(wejscia, 1); //wy¶wietlenie wyniku dla wej¶æ
-				IOCLR = 0x00040000; //zapali siê niebieska dioda RGB
-				delayMs(300);
-			}
-			if (prawieWyszedlem) //je¶li by³o prawieWyszed³=1, tutaj jest koniec wyj¶cia
-			{	
-				consolSendString("Wyszed³em -- \n");
-				prawieWyszedlem = 0; //zerowanie pomocników
-				wyjscia += 1;
-				wyswietlWynik(wyjscia, 2); //wy¶wietlenie wyniku dla wyj¶æ
-				IOCLR = 0x00020000; //zapalenie diody rgb - Czerwona	
-				delayMs(300);
-			}
-		}	
-	}
 }

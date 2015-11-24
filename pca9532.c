@@ -14,7 +14,8 @@
 /******************************************************************************
  * Includes
  *****************************************************************************/
-#include <general.h>
+#include "../pre_emptive_os/api/osapi.h"
+#include "../pre_emptive_os/api/general.h"
 #include <lpc2xxx.h>
 #include <printf_P.h>
 #include "i2c.h"

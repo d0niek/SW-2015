@@ -14,8 +14,8 @@
 /******************************************************************************
  * Includes
  *****************************************************************************/
-#include "../startup/general.h"
-#include "osapi.h"
+#include "../pre_emptive_os/api/general.h"
+#include "../pre_emptive_os/api/osapi.h"
 #include "lcd.h"
 #include "ascii.h"
 #include "lcd_hw.h"
@@ -79,11 +79,11 @@ lcdInit(void)
 
 	lcdWrcmd(LCD_CMD_SWRESET);
 
-	//osSleep(1);
+	osSleep(1);
 	lcdWrcmd(LCD_CMD_SLEEPOUT);
 	lcdWrcmd(LCD_CMD_DISPON);
 	lcdWrcmd(LCD_CMD_BSTRON);
-	//osSleep(1);
+	osSleep(1);
 		
 	lcdWrcmd(LCD_CMD_MADCTL);   //Memory data acces control
 	lcdWrdata(MADCTL_HORIZ);    //X Mirror and BGR format
