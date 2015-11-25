@@ -52,13 +52,13 @@ CODE    = THUMB
 
 # List C source files here.
 CSRCS   = main.c          \
-          eepromTest.c    \
-          eeprom.c        \
-          i2c.c           \
+          util/eeprom/eepromTest.c    \
+          util/eeprom/eeprom.c        \
+          util/i2c.c           \
           adc.c           \
           pca9532.c       \
-          util\lcd\lcd.c           \
-          util\lcd\lcd_hw.c        \
+          util/lcd/lcd.c           \
+          util/lcd/lcd_hw.c        \
           counter.c
 
 # List assembler source files here

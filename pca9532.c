@@ -18,8 +18,8 @@
 #include "../pre_emptive_os/api/general.h"
 #include <lpc2xxx.h>
 #include <printf_P.h>
-#include "i2c.h"
-#include "eeprom.h"
+#include "util/i2c.h"
+#include "util/eeprom/eeprom.h"
 #include "pca9532.h"
 
 /******************************************************************************
