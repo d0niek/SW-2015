@@ -7,6 +7,6 @@
 
 #include "value.h"
 
-void counter(Value enters, Value exits);
+void counter(struct Value enters, struct Value exits);
 
 #endif //LICZNIK_COUNTER_H

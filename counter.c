@@ -4,12 +4,15 @@
 
 #include "counter.h"
 #include "pre_emptive_os/api/general.h"
+#include "printf_P.h"
+#include "startup/config.h"
+#include <lpc2xxx.h>
 
 #define LASER_A 0x00100000
 #define LASER_B 0x00400000
 
-tS32 enter = 0;
-tS32 exit = 0;
+tS32 _enter = 0;
+tS32 _exit = 0;
 tS32 almostEnter = 0;
 tS32 almostExit = 0;
 
@@ -48,24 +51,21 @@ void udelay(unsigned int delayInUs)
  *    [in] exits
  *
  ****************************************************************************/
-void counter(Value enters, Value exits)
+void counter(struct Value enters, struct Value exits)
 {
     tS32 crossA = 0;
     tS32 crossB = 0;
 
-    static tU8 cnt;
-    tU8 rxChar;
-
     if (enters.current > 999) {
         printf("Exceeded the maximum value of enters\n");
         enters.current = 0;
-        enters.setLast();
+        setLast(&enters);
     }
 
     if (exits.current > 999) {
         printf("Exceeded the maximum value of exits\n");
         exits.current = 0;
-        exits.setLast();
+        setLast(&exits);
     }
 
     // Detect if P1.20 key is pressed
@@ -84,29 +84,29 @@ void counter(Value enters, Value exits)
         IOSET1 = 0x00040000;
     }
 
-    if (!enter && !exit) {
+    if (!_enter && !_exit) {
         if (crossA && !crossB) {
             printf("Coming in\n");
-            enter = 1;
+            _enter = 1;
         } else if (!crossA && crossB) {
             printf("Coming out\n");
-            exit = 1;
+            _exit = 1;
         }
     }
 
-    if (enter && !crossA && crossB) {
+    if (_enter && !crossA && crossB) {
         printf("Almost enter\n");
         almostEnter = 1;
     }
 
-    if (exit && crossA && !crossB) {
+    if (_exit && crossA && !crossB) {
         printf("Almost exit\n");
         almostExit = 1;
     }
 
     if (!crossA && !crossB) {
-        enter = 0;
-        exit = 0;
+        _enter = 0;
+        _exit = 0;
 
         if (almostEnter) {
             printf("Entered\n");

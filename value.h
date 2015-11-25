@@ -11,16 +11,11 @@ struct Value
 {
     tS32 current;
     tS32 last;
-
-    Value() :
-        current(0), last(0)
-    {
-    }
-
-    void setLast()
-    {
-        this->last = this->current;
-    }
 };
+
+void setLast(struct Value *v)
+{
+	v->last = v->current;
+}
 
 #endif //LICZNIK_VALUE_H

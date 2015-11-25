@@ -32,7 +32,8 @@ static tU8 initStack[INIT_STACK_SIZE];
 static tU8 pid1;
 static tU8 pid2;
 
-Value enters, exits;
+struct Value enters = {0, 0};
+struct Value exits = {0, 0};
 
 static void initProc(void *arg);
 static void proc1(void *arg);
@@ -130,7 +131,9 @@ static void proc1(void *arg)
     IODIR1 &= ~0x00F00000;  //Keys
 
     for (; ;) {
-        counter(enters, exits);
+    	tU8 rxChar;
+
+    	counter(enters, exits);
 
         // rgbLight();
 
@@ -200,12 +203,12 @@ static void proc2(void *arg)
         if (TRUE == pca9532Present) {
             if (enters.current != enters.last) {
                 displayResult(enters.current, 1);
-                enters.setLast();
+                setLast(&enters);
             }
 
             if (exits.current != exits.last) {
                 displayResult(exits.current, 2);
-                exits.setLast();
+                setLast(&exits);
             }
         } else {
             rgbSpeed = (getAnalogueInput(AIN1) >> 7) + 3;
