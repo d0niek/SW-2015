@@ -57,8 +57,8 @@ CSRCS   = main.c          \
           i2c.c           \
           adc.c           \
           pca9532.c       \
-          lcd.c           \
-          lcd_hw.c        \
+          util\lcd\lcd.c           \
+          util\lcd\lcd_hw.c        \
           counter.c
 
 # List assembler source files here
