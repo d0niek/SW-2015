@@ -11,7 +11,7 @@
 #ifndef _ADC_H_
 #define _ADC_H_
 
-#include "../pre_emptive_os/api/general.h"
+#include "../../pre_emptive_os/api/general.h"
 
 /******************************************************************************
  * Defines and typedefs

@@ -15,7 +15,7 @@
 #include <lpc2xxx.h>
 #include <consol.h>
 #include "util/i2c.h"
-#include "adc.h"
+#include "util/adc/adc.h"
 #include "util/lcd/lcd.h"
 #include "pca9532.h"
 #include "ea_97x60c.h"

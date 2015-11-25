@@ -55,7 +55,7 @@ CSRCS   = main.c \
           util/eeprom/eepromTest.c \
           util/eeprom/eeprom.c \
           util/i2c.c \
-          adc.c \
+          util/adc/adc.c \
           pca9532.c \
           util/lcd/lcd.c \
           util/lcd/lcd_hw.c \
