@@ -8,13 +8,16 @@
 #include "startup/config.h"
 #include <lpc2xxx.h>
 
-#define LASER_A 0x00100000
-#define LASER_B 0x00400000
+#define KEY_A 0x00100000
+#define KEY_B 0x00400000
 
 tS32 _enter = 0;
 tS32 _exit = 0;
 tS32 almostEnter = 0;
 tS32 almostExit = 0;
+
+void checkCrossA(tS32 *crossA);
+void checkCrossB(tS32 *crossB);
 
 /******************************************************************************
  * Function name:		udelay
@@ -69,20 +72,10 @@ void counter(struct Value enters, struct Value exits)
     }
 
     // Detect if P1.20 key is pressed
-    if ((IOPIN1 & LASER_A) == 0) {
-        IOCLR1 = 0x00010000;
-        crossA = 1;
-    } else {
-        IOSET1 = 0x00010000;
-    }
+    checkCrossA(&crossA);
 
     // Detect if P1.22 key is pressed
-    if ((IOPIN1 & LASER_B) == 0) {
-        IOCLR1 = 0x00040000;
-        crossB = 1;
-    } else {
-        IOSET1 = 0x00040000;
-    }
+    checkCrossA(&crossB);
 
     if (!_enter && !_exit) {
         if (crossA && !crossB) {
@@ -124,4 +117,24 @@ void counter(struct Value enters, struct Value exits)
             udelay(300);
         }
     }
+}
+
+void checkCrossA(tS32 *crossA)
+{
+	if ((IOPIN1 & KEY_A) == 0) {
+		IOCLR1 = 0x00010000;
+		*crossA = 1;
+	} else {
+		IOSET1 = 0x00010000;
+	}
+}
+
+void checkCrossB(tS32 *crossB)
+{
+	if ((IOPIN1 & KEY_B) == 0) {
+		IOCLR1 = 0x00040000;
+		*crossB = 1;
+	} else {
+		IOSET1 = 0x00040000;
+	}
 }
