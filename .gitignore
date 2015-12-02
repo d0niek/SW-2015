@@ -4,6 +4,7 @@
 *.elf
 *.map
 *.cproject
-*.depend
+startup/.depend
+.depend
 *.project
 *.hex
