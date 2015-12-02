@@ -3,6 +3,7 @@
 *.lst
 *.elf
 *.map
-.cproject
-.depend
-.project
+*.cproject
+*.depend
+*.project
+*.hex
