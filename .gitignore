@@ -8,3 +8,4 @@ startup/.depend
 .depend
 *.project
 *.hex
+*.bak
