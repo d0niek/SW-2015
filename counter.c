@@ -75,7 +75,7 @@ void counter(struct Value enters, struct Value exits)
     checkCrossA(&crossA);
 
     // Detect if P1.22 key is pressed
-    checkCrossA(&crossB);
+    checkCrossB(&crossB);
 
     if (!_enter && !_exit) {
         if (crossA && !crossB) {
@@ -101,11 +101,13 @@ void counter(struct Value enters, struct Value exits)
         _enter = 0;
         _exit = 0;
 
+        IOSET = 0x00260000;
+
         if (almostEnter) {
             printf("Entered\n");
             almostEnter = 0;
             enters.current += 1;
-            IOCLR = 0x00040000; // zapali si? niebieska dioda RGB
+            IOCLR = 0x00040000; // Blue led
             udelay(300);
         }
 
@@ -113,7 +115,7 @@ void counter(struct Value enters, struct Value exits)
             printf("Went\n");
             almostExit = 0;
             exits.current += 1;
-            IOCLR = 0x00020000; // zapalenie diody rgb - Czerwona
+            IOCLR = 0x00020000; // Red led
             udelay(300);
         }
     }
