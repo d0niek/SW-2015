@@ -59,7 +59,8 @@ CSRCS   = main.c \
           pca9532.c \
           util/lcd/lcd.c \
           util/lcd/lcd_hw.c \
-          counter.c
+          counter.c \
+          value.c
 
 # List assembler source files here
 ASRCS   = 

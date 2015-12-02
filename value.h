@@ -13,9 +13,6 @@ struct Value
     tS32 last;
 };
 
-void setLast(struct Value *v)
-{
-	v->last = v->current;
-}
+void setLast(struct Value *v);
 
 #endif //LICZNIK_VALUE_H
