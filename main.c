@@ -133,7 +133,7 @@ static void proc1(void *arg)
     for (; ;) {
     	tU8 rxChar;
 
-    	counter(enters, exits);
+    	counter(&enters, &exits);
 
         // rgbLight();
 

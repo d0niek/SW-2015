@@ -54,21 +54,21 @@ void udelay(unsigned int delayInUs)
  *    [in] exits
  *
  ****************************************************************************/
-void counter(struct Value enters, struct Value exits)
+void counter(struct Value *enters, struct Value *exits)
 {
     tS32 crossA = 0;
     tS32 crossB = 0;
 
-    if (enters.current > 999) {
+    if (enters->current > 999) {
         printf("Exceeded the maximum value of enters\n");
-        enters.current = 0;
-        setLast(&enters);
+        enters->current = 0;
+        setLast(enters);
     }
 
-    if (exits.current > 999) {
+    if (exits->current > 999) {
         printf("Exceeded the maximum value of exits\n");
-        exits.current = 0;
-        setLast(&exits);
+        exits->current = 0;
+        setLast(exits);
     }
 
     // Detect if P1.20 key is pressed
@@ -106,7 +106,7 @@ void counter(struct Value enters, struct Value exits)
         if (almostEnter) {
             printf("Entered\n");
             almostEnter = 0;
-            enters.current += 1;
+            enters->current += 1;
             IOCLR = 0x00040000; // Blue led
             udelay(300);
         }
@@ -114,7 +114,7 @@ void counter(struct Value enters, struct Value exits)
         if (almostExit) {
             printf("Went\n");
             almostExit = 0;
-            exits.current += 1;
+            exits->current += 1;
             IOCLR = 0x00020000; // Red led
             udelay(300);
         }
