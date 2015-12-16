@@ -71,10 +71,7 @@ void counter(struct Value *enters, struct Value *exits)
         setLast(exits);
     }
 
-    // Detect if P1.20 key is pressed
     checkCrossA(&crossA);
-
-    // Detect if P1.22 key is pressed
     checkCrossB(&crossB);
 
     if (!_enter && !_exit) {
@@ -123,20 +120,36 @@ void counter(struct Value *enters, struct Value *exits)
 
 void checkCrossA(tS32 *crossA)
 {
-	if ((IOPIN1 & KEY_A) == 0) {
-		IOCLR1 = 0x00010000;
+	// Detect if P1.20 key is pressed
+//	if ((IOPIN1 & KEY_A) == 0) {
+//		IOCLR1 = 0x00010000;
+//		*crossA = 1;
+//	} else {
+//		IOSET1 = 0x00010000;
+//	}
+
+	if ((IOPIN & GATE_A) != 0) {
+		IOSET1 = 0x00010000;
 		*crossA = 1;
 	} else {
-		IOSET1 = 0x00010000;
+		IOCLR1 = 0x00010000;
 	}
 }
 
 void checkCrossB(tS32 *crossB)
 {
-	if ((IOPIN1 & KEY_B) == 0) {
-		IOCLR1 = 0x00040000;
+	// Detect if P1.22 key is pressed
+//	if ((IOPIN1 & KEY_B) == 0) {
+//		IOCLR1 = 0x00040000;
+//		*crossB = 1;
+//	} else {
+//		IOSET1 = 0x00040000;
+//	}
+
+	if((IOPIN & GATE_B) != 0) {
+		IOSET1 = 0x00040000;
 		*crossB = 1;
 	} else {
-		IOSET1 = 0x00040000;
+		IOCLR1 = 0x00040000;
 	}
 }

@@ -130,6 +130,9 @@ static void proc1(void *arg)
     IOSET1 = 0x000F0000;
     IODIR1 &= ~0x00F00000;  //Keys
 
+    IODIR0 &= ~GATE_A;
+    IODIR0 &= ~GATE_B;
+
     for (; ;) {
     	tU8 rxChar;
 

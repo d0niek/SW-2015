@@ -7,6 +7,9 @@
 
 #include "value.h"
 
+#define GATE_A (1 << 17)
+#define GATE_B (1 << 11)
+
 void counter(struct Value *enters, struct Value *exits);
 
 #endif //LICZNIK_COUNTER_H
