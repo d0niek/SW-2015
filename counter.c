@@ -7,6 +7,7 @@
 #include "printf_P.h"
 #include "startup/config.h"
 #include "util/functions.h"
+#include "util/adc/adc.h"
 #include <lpc2xxx.h>
 
 #define KEY_A 0x00100000
@@ -17,8 +18,22 @@ tS32 _exit = 0;
 tS32 almostEnter = 0;
 tS32 almostExit = 0;
 
+tS16 refXvalue;
+tS16 refYvalue;
+tS16 refZvalue;
+
 void checkCrossA(tS32 *crossA);
 void checkCrossB(tS32 *crossB);
+
+/**
+ *
+ */
+void initAcc()
+{
+	refXvalue = getAnalogueInput1(ACCEL_X);
+	refYvalue = getAnalogueInput1(ACCEL_Y);
+	refZvalue = getAnalogueInput0(ACCEL_Z);
+}
 
 /*****************************************************************************
  *
@@ -127,5 +142,25 @@ void checkCrossB(tS32 *crossB)
 		*crossB = 1;
 	} else {
 		IOCLR1 = 0x00040000;
+	}
+}
+
+/**
+ *
+ */
+bool isEarthquake()
+{
+	tS16 Xvalue = getAnalogueInput1(ACCEL_X);
+	tS16 Yvalue = getAnalogueInput1(ACCEL_Y);
+	tS16 Zvalue = getAnalogueInput0(ACCEL_Z);
+
+	tS16 deviation = 20;
+
+	//check if z
+	if (Yvalue - refYvalue >= deviation || Xvalue - refXvalue <= -deviation ||
+		Yvalue - refYvalue <= -deviation || Xvalue - refXvalue >= deviation) {
+		return TRUE;
+	} else {
+		return FALSE;
 	}
 }

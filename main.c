@@ -135,6 +135,8 @@ static void proc1(void *arg)
 
     IODIR1 &= ~RESET_BUTTON;
 
+    initAcc();
+
     for (; ;) {
     	tU8 rxChar;
 
