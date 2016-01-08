@@ -133,10 +133,18 @@ static void proc1(void *arg)
     IODIR0 &= ~GATE_A;
     IODIR0 &= ~GATE_B;
 
+    IODIR1 &= ~RESET_BUTTON;
+
     for (; ;) {
     	tU8 rxChar;
 
     	counter(&enters, &exits);
+
+    	if ((IOPIN1 & RESET_BUTTON) == 0) {
+    		consolSendString("Counter reset \n");
+    		enters.current = 0;
+    		exits.current = 0;
+    	}
 
         // rgbLight();
 
@@ -214,7 +222,7 @@ static void proc2(void *arg)
                 setLast(&exits);
             }
         } else {
-            rgbSpeed = (getAnalogueInput(AIN1) >> 7) + 3;
+            rgbSpeed = (getAnalogueInput0(AIN1) >> 7) + 3;
         }
     }
 }

@@ -60,7 +60,8 @@ CSRCS   = main.c \
           util/lcd/lcd.c \
           util/lcd/lcd_hw.c \
           counter.c \
-          value.c
+          value.c \
+          util/functions.c
 
 # List assembler source files here
 ASRCS   = 

@@ -9,6 +9,7 @@
 
 #define GATE_A (1 << 17)
 #define GATE_B (1 << 11)
+#define RESET_BUTTON (1 << 23)
 
 void counter(struct Value *enters, struct Value *exits);
 
