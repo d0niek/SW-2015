@@ -24,6 +24,7 @@ tS16 refZvalue;
 
 void checkCrossA(tS32 *crossA);
 void checkCrossB(tS32 *crossB);
+_Bool isEarthquake();
 
 /**
  *
@@ -112,43 +113,43 @@ void counter(struct Value *enters, struct Value *exits)
 void checkCrossA(tS32 *crossA)
 {
 	// Detect if P1.20 key is pressed
-//	if ((IOPIN1 & KEY_A) == 0) {
-//		IOCLR1 = 0x00010000;
-//		*crossA = 1;
-//	} else {
-//		IOSET1 = 0x00010000;
-//	}
-
-	if ((IOPIN & GATE_A) != 0) {
-		IOSET1 = 0x00010000;
+	if ((IOPIN1 & KEY_A) == 0 && !isEarthquake()) {
+		IOCLR1 = 0x00010000;
 		*crossA = 1;
 	} else {
-		IOCLR1 = 0x00010000;
+		IOSET1 = 0x00010000;
 	}
+
+//	if ((IOPIN & GATE_A) != 0 && !isEarthquake()) {
+//		IOSET1 = 0x00010000;
+//		*crossA = 1;
+//	} else {
+//		IOCLR1 = 0x00010000;
+//	}
 }
 
 void checkCrossB(tS32 *crossB)
 {
 	// Detect if P1.22 key is pressed
-//	if ((IOPIN1 & KEY_B) == 0) {
-//		IOCLR1 = 0x00040000;
-//		*crossB = 1;
-//	} else {
-//		IOSET1 = 0x00040000;
-//	}
-
-	if((IOPIN & GATE_B) != 0) {
-		IOSET1 = 0x00040000;
+	if ((IOPIN1 & KEY_B) == 0 && !isEarthquake()) {
+		IOCLR1 = 0x00040000;
 		*crossB = 1;
 	} else {
-		IOCLR1 = 0x00040000;
+		IOSET1 = 0x00040000;
 	}
+
+//	if((IOPIN & GATE_B) != 0 && !isEarthquake()) {
+//		IOSET1 = 0x00040000;
+//		*crossB = 1;
+//	} else {
+//		IOCLR1 = 0x00040000;
+//	}
 }
 
 /**
  *
  */
-bool isEarthquake()
+_Bool isEarthquake()
 {
 	tS16 Xvalue = getAnalogueInput1(ACCEL_X);
 	tS16 Yvalue = getAnalogueInput1(ACCEL_Y);
@@ -156,11 +157,16 @@ bool isEarthquake()
 
 	tS16 deviation = 20;
 
-	//check if z
-	if (Yvalue - refYvalue >= deviation || Xvalue - refXvalue <= -deviation ||
-		Yvalue - refYvalue <= -deviation || Xvalue - refXvalue >= deviation) {
-		return TRUE;
+	if (Yvalue - refYvalue >= deviation ||
+		Xvalue - refXvalue <= -deviation ||
+		Yvalue - refYvalue <= -deviation ||
+		Xvalue - refXvalue >= deviation) {
+		printf("is Earthquake\n");
+
+		return TREU;
 	} else {
+		printf("is not Earthquake\n");
+
 		return FALSE;
 	}
 }
