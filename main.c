@@ -194,7 +194,7 @@ static void proc2(void *arg)
         lcdGotoxy(20, 80);
         lcdPuts("produced by");
 
-        lcdGotoxy(0, 96);
+        lcdGotoxy(50, 96);
         lcdPuts("G&C");
 
         lcdGotoxy(8, 112);
@@ -204,10 +204,10 @@ static void proc2(void *arg)
     //Initialize ADC
     initAdc();
 
-    T1TCR = 0;            // counter disable
-    T1PR = 0;            // set prescaler /1
-    T1MCR = 0;            // disable match act
-    T1EMR = 0;            // disable external match act
+    T1TCR = 0; // counter disable
+    T1PR = 0; // set prescaler /1
+    T1MCR = 0; // disable match act
+    T1EMR = 0; // disable external match act
     IOSET1 = ((1UL << 25) | (1UL << 24));
     IODIR1 |= ((1UL << 25) | (1UL << 24));
 
@@ -215,12 +215,12 @@ static void proc2(void *arg)
         osSleep(10);
         if (TRUE == pca9532Present) {
             if (enters.current != enters.last) {
-                displayResult(enters.current, 1);
+                displayResult(enters.current, 0);
                 setLast(&enters);
             }
 
             if (exits.current != exits.last) {
-                displayResult(exits.current, 2);
+                displayResult(exits.current, 1);
                 setLast(&exits);
             }
         } else {
@@ -281,11 +281,11 @@ static void displayResult(tS32 result, tS32 position)
     liczChar[1] = (result - ((result / 100) * 100)) / 10 + '0';
     liczChar[2] = result % 10 + '0';
 
-    consolSendString("Licznik \n");
+    consolSendString("Counter \n");
     consolSendString(liczChar);
     consolSendString("\n");
 
-    lcdGotoxy(20, position * 40);
+    lcdGotoxy(80, position * 20 + 10);
     lcdColor(0xA1, 0x00);
     lcdPuts(liczChar);
 }
