@@ -31,9 +31,9 @@ _Bool isEarthquake();
  */
 void initAcc()
 {
-	refXvalue = getAnalogueInput1(ACCEL_X);
-	refYvalue = getAnalogueInput1(ACCEL_Y);
-	refZvalue = getAnalogueInput0(ACCEL_Z);
+    refXvalue = getAnalogueInput1(ACCEL_X);
+    refYvalue = getAnalogueInput1(ACCEL_Y);
+    refZvalue = getAnalogueInput0(ACCEL_Z);
 }
 
 /*****************************************************************************
@@ -112,38 +112,38 @@ void counter(struct Value *enters, struct Value *exits)
 
 void checkCrossA(tS32 *crossA)
 {
-	// Detect if P1.20 key is pressed
-//	if ((IOPIN1 & KEY_A) == 0 && !isEarthquake()) {
-//		IOCLR1 = 0x00010000;
-//		*crossA = 1;
-//	} else {
-//		IOSET1 = 0x00010000;
-//	}
+    // Detect if P1.20 key is pressed
+//    if ((IOPIN1 & KEY_A) == 0 && !isEarthquake()) {
+//        IOCLR1 = 0x00010000;
+//        *crossA = 1;
+//    } else {
+//        IOSET1 = 0x00010000;
+//    }
 
-	if ((IOPIN & GATE_A) != 0 && !isEarthquake()) {
-		IOSET1 = 0x00010000;
-		*crossA = 1;
-	} else {
-		IOCLR1 = 0x00010000;
-	}
+    if ((IOPIN & GATE_A) != 0 && !isEarthquake()) {
+        IOSET1 = 0x00010000;
+        *crossA = 1;
+    } else {
+        IOCLR1 = 0x00010000;
+    }
 }
 
 void checkCrossB(tS32 *crossB)
 {
-	// Detect if P1.22 key is pressed
-//	if ((IOPIN1 & KEY_B) == 0 && !isEarthquake()) {
-//		IOCLR1 = 0x00040000;
-//		*crossB = 1;
-//	} else {
-//		IOSET1 = 0x00040000;
-//	}
+    // Detect if P1.22 key is pressed
+//    if ((IOPIN1 & KEY_B) == 0 && !isEarthquake()) {
+//        IOCLR1 = 0x00040000;
+//        *crossB = 1;
+//    } else {
+//        IOSET1 = 0x00040000;
+//    }
 
-	if((IOPIN & GATE_B) != 0 && !isEarthquake()) {
-		IOSET1 = 0x00040000;
-		*crossB = 1;
-	} else {
-		IOCLR1 = 0x00040000;
-	}
+    if((IOPIN & GATE_B) != 0 && !isEarthquake()) {
+        IOSET1 = 0x00040000;
+        *crossB = 1;
+    } else {
+        IOCLR1 = 0x00040000;
+    }
 }
 
 /**
@@ -151,22 +151,22 @@ void checkCrossB(tS32 *crossB)
  */
 _Bool isEarthquake()
 {
-	tS16 Xvalue = getAnalogueInput1(ACCEL_X);
-	tS16 Yvalue = getAnalogueInput1(ACCEL_Y);
-	tS16 Zvalue = getAnalogueInput0(ACCEL_Z);
+    tS16 Xvalue = getAnalogueInput1(ACCEL_X);
+    tS16 Yvalue = getAnalogueInput1(ACCEL_Y);
+    tS16 Zvalue = getAnalogueInput0(ACCEL_Z);
 
-	tS16 deviation = 20;
+    tS16 deviation = 20;
 
-	if (Yvalue - refYvalue >= deviation ||
-		Xvalue - refXvalue <= -deviation ||
-		Yvalue - refYvalue <= -deviation ||
-		Xvalue - refXvalue >= deviation) {
-		printf("is Earthquake\n");
+    if (Yvalue - refYvalue >= deviation ||
+        Xvalue - refXvalue <= -deviation ||
+        Yvalue - refYvalue <= -deviation ||
+        Xvalue - refXvalue >= deviation) {
+        printf("is Earthquake\n");
 
-		return TRUE;
-	} else {
-		printf("is not Earthquake\n");
+        return TRUE;
+    } else {
+        printf("is not Earthquake\n");
 
-		return FALSE;
-	}
+        return FALSE;
+    }
 }

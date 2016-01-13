@@ -138,15 +138,15 @@ static void proc1(void *arg)
     initAcc();
 
     for (; ;) {
-    	tU8 rxChar;
+        tU8 rxChar;
 
-    	counter(&enters, &exits);
+        counter(&enters, &exits);
 
-    	if ((IOPIN1 & RESET_BUTTON) == 0) {
-    		consolSendString("Counter reset \n");
-    		enters.current = 0;
-    		exits.current = 0;
-    	}
+        if ((IOPIN1 & RESET_BUTTON) == 0) {
+            consolSendString("Counter reset \n");
+            enters.current = 0;
+            exits.current = 0;
+        }
 
         // rgbLight();
 
