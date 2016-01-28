@@ -85,6 +85,11 @@ void counter(struct Value *enters, struct Value *exits)
         printf("Almost exit\n");
         almostExit = 1;
     }
+    
+    if (crossA && crossB) {
+        almostEnter = 0;
+        almostExit = 0;
+    }
 
     if (!crossA && !crossB) {
         _enter = 0;
