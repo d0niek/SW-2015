@@ -104,7 +104,7 @@ void counter(struct Value *enters, struct Value *exits)
             printf("Entered\n");
             almostEnter = 0;
             enters->current += 1;
-            IOCLR = 0x00040000; // Blue led
+            IOCLR = (1 << 18); // Blue led
             udelay(300);
         }
 
@@ -112,7 +112,7 @@ void counter(struct Value *enters, struct Value *exits)
             printf("Went\n");
             almostExit = 0;
             exits->current += 1;
-            IOCLR = 0x00020000; // Red led
+            IOCLR = (1 << 17); // Red led
             udelay(300);
         }
     }
@@ -127,10 +127,10 @@ void counter(struct Value *enters, struct Value *exits)
 void checkCrossA(tS32 *crossA)
 {
     if ((IOPIN & GATE_A) != 0 && !isEarthquake()) {
-        IOSET1 = 0x00010000;
+        IOSET1 = (1 << 16);
         *crossA = 1;
     } else {
-        IOCLR1 = 0x00010000;
+        IOCLR1 = (1 << 16);
     }
 }
 
@@ -143,10 +143,10 @@ void checkCrossA(tS32 *crossA)
 void checkCrossB(tS32 *crossB)
 {
     if((IOPIN & GATE_B) != 0 && !isEarthquake()) {
-        IOSET1 = 0x00040000;
+        IOSET1 = (1 << 17);
         *crossB = 1;
     } else {
-        IOCLR1 = 0x00040000;
+        IOCLR1 = (1 << 17);
     }
 }
 
