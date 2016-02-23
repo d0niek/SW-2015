@@ -126,14 +126,6 @@ void counter(struct Value *enters, struct Value *exits)
  */
 void checkCrossA(tS32 *crossA)
 {
-    // Detect if P1.20 key is pressed
-//    if ((IOPIN1 & KEY_A) == 0 && !isEarthquake()) {
-//        IOCLR1 = 0x00010000;
-//        *crossA = 1;
-//    } else {
-//        IOSET1 = 0x00010000;
-//    }
-
     if ((IOPIN & GATE_A) != 0 && !isEarthquake()) {
         IOSET1 = 0x00010000;
         *crossA = 1;
@@ -150,14 +142,6 @@ void checkCrossA(tS32 *crossA)
  */
 void checkCrossB(tS32 *crossB)
 {
-    // Detect if P1.22 key is pressed
-//    if ((IOPIN1 & KEY_B) == 0 && !isEarthquake()) {
-//        IOCLR1 = 0x00040000;
-//        *crossB = 1;
-//    } else {
-//        IOSET1 = 0x00040000;
-//    }
-
     if((IOPIN & GATE_B) != 0 && !isEarthquake()) {
         IOSET1 = 0x00040000;
         *crossB = 1;
