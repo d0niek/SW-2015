@@ -10,8 +10,8 @@
 #include "util/adc/adc.h"
 #include <lpc2xxx.h>
 
-#define KEY_A 0x00100000
-#define KEY_B 0x00400000
+#define KEY_A (1 << 20)
+#define KEY_B (1 << 22)
 
 tS32 _enter = 0;
 tS32 _exit = 0;
