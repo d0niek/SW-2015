@@ -38,7 +38,6 @@ struct Value exits = {0, 0};
 static void initProc(void *arg);
 static void proc1(void *arg);
 static void proc2(void *arg);
-void rgbLight();
 static void displayResult(tS32 result, tS32 position);
 
 volatile tU32 msClock;
@@ -148,8 +147,6 @@ static void proc1(void *arg)
             exits.current = 0;
         }
 
-        // rgbLight();
-
         //echo terminal
         if (TRUE == consolGetChar(&rxChar)) {
             consolSendCh(rxChar);
@@ -244,24 +241,6 @@ static void proc2(void *arg)
 void appTick(tU32 elapsedTime)
 {
     msClock += elapsedTime;
-}
-
-void rgbLight()
-{
-    static tU8 cnt;
-
-    cnt++;
-    if ((cnt % rgbSpeed) == 0) {
-        IOSET = 0x00260000;
-        if (cnt == rgbSpeed) {
-            IOCLR = 0x00020000;
-        } else if (cnt == (2 * rgbSpeed)) {
-            IOCLR = 0x00040000;
-        } else {
-            IOCLR = 0x00200000;
-            cnt = 0;
-        }
-    }
 }
 
 /*****************************************************************************
