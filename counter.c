@@ -26,9 +26,12 @@ void checkCrossA(tS32 *crossA);
 void checkCrossB(tS32 *crossB);
 _Bool isEarthquake();
 
-/**
+/*****************************************************************************
  *
- */
+ * Description:
+ *    Initialize starting values for accelerometer
+ *
+ ****************************************************************************/
 void initAcc()
 {
     refXvalue = getAnalogueInput1(ACCEL_X);
@@ -39,7 +42,7 @@ void initAcc()
 /*****************************************************************************
  *
  * Description:
- *    ...
+ *    Count enters and exit from "room"
  *
  * Params:
  *    [in] enters
@@ -85,7 +88,7 @@ void counter(struct Value *enters, struct Value *exits)
         printf("Almost exit\n");
         almostExit = 1;
     }
-    
+
     if (crossA && crossB) {
         almostEnter = 0;
         almostExit = 0;
@@ -115,6 +118,12 @@ void counter(struct Value *enters, struct Value *exits)
     }
 }
 
+/**
+ *
+ * Description:
+ *    Check if laser A was cross
+ *
+ */
 void checkCrossA(tS32 *crossA)
 {
     // Detect if P1.20 key is pressed
@@ -133,6 +142,12 @@ void checkCrossA(tS32 *crossA)
     }
 }
 
+/**
+ *
+ * Description:
+ *    Check if laser B was cross
+ *
+ */
 void checkCrossB(tS32 *crossB)
 {
     // Detect if P1.22 key is pressed
@@ -152,6 +167,9 @@ void checkCrossB(tS32 *crossB)
 }
 
 /**
+ *
+ * Description:
+ *    Check if lasers and lights barriers are shaking
  *
  */
 _Bool isEarthquake()
